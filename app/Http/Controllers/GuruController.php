@@ -64,11 +64,21 @@ class GuruController extends Controller
             'nip' => 'required|string|max:20|unique:guru,nip,' . $id,
         ]);
 
+            // Ambil data guru
         $guru = Guru::findOrFail($id);
-
         $guru->nama = $request->nama;
         $guru->nip = $request->nip;
-        $guru->save(); // ✅ pastikan benar-benar disimpan
+        $guru->save();
+
+        // ✅ Update juga data users yang berelasi
+        if ($guru->user_id) {
+            $user = \App\Models\User::find($guru->user_id);
+            if ($user) {
+                $user->name = $request->nama;
+                $user->username = $request->nip; // jika username pakai nip
+                $user->save();
+            }
+        }
 
         return redirect()->route('guru.index')->with('success', 'Data guru berhasil diperbarui.');
     }

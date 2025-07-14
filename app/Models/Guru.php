@@ -10,4 +10,9 @@ class Guru extends Model
     protected $fillable=['name','nip'];
 
     protected $guarded= [];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
