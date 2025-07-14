@@ -123,19 +123,19 @@ class SiswaController extends Controller
     }
 
     public function delete($id)
-{
-    $siswa = Siswa::findOrFail($id);
+    {
+        $siswa = Siswa::findOrFail($id);
 
-    // Hapus user yang berelasi jika ada
-    if ($siswa->user) {
-        $siswa->user->delete();
+        // Hapus user yang berelasi jika ada
+        if ($siswa->user) {
+            $siswa->user->delete();
+        }
+
+        // Hapus siswa
+        $siswa->delete();
+
+        return redirect()->route('siswa.index')->with('success', 'Data siswa dan user berhasil dihapus.');
     }
-
-    // Hapus siswa
-    $siswa->delete();
-
-    return redirect()->route('siswa.index')->with('success', 'Data siswa dan user berhasil dihapus.');
-}
 
 
 }

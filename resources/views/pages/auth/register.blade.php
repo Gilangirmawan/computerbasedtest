@@ -78,9 +78,18 @@
                                                 placeholder="Masukkan Username..." name="username">
                                         </div>
                                         <div class="form-group">
-                                            <input type="text" name="kelas" class="form-control form-control-user"
-                                                id="inputKelas" aria-describedby="kelasHelp"
-                                                placeholder="Masukkan Kelas..." name="kelas">
+                                            <select name="kelas_id" required>
+                                                @foreach($kelasList as $k)
+                                                    <option value="{{ $k->id }}">{{ $k->kelas }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                         <div class="form-group">
+                                            <select name="jurusan_id" required>
+                                                @foreach($jurusanList as $j)
+                                                    <option value="{{ $j->kode_jurusan }}">{{ $j->nama }}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <div class="form-group">
                                             <input type="password" name="password" class="form-control form-control-user"

@@ -58,7 +58,10 @@ class AuthController extends Controller
 
     public function registerView()
     {
-        return view('pages.auth.register');
+        $kelasList = \App\Models\Kelas::all();
+        $jurusanList = \App\Models\Jurusan::all();
+
+        return view('pages.auth.register', compact('kelasList', 'jurusanList'));
     }
 
     public function register(Request $request)
@@ -69,6 +72,8 @@ class AuthController extends Controller
             'nis' => ['required', 'string', 'unique:siswa'],
             'username' => ['required', 'alpha_dash'], 
             'password' => ['required'],
+            'kelas_id' => 'required|exists:kelas,id',
+            'jurusan_id' => 'required|exists:jurusan,kode_jurusan',
         ]);
 
     // Simpan data user siswa
@@ -87,7 +92,8 @@ class AuthController extends Controller
     $siswa->nama = $request->input('name');
     $siswa->username = $request->input('username');
     $siswa->password = Hash::make($request->input('password'));
-    $siswa->kelas = $request->input('kelas');
+    $siswa->kelas_id = $request->input('kelas_id'); // ✅ ini benar
+    $siswa->jurusan_id = $request->input('jurusan_id'); // ✅ ini benar
     $siswa->save();
 
     return redirect()->route('login')->with('success', 'Pendaftaran berhasil, silakan login.');
