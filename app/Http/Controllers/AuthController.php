@@ -13,11 +13,19 @@ class AuthController extends Controller
 {
      public function login()
     {
+        if(Auth::check()) {
+            return back();
+        }
+
         return view('pages.auth.login');
     }
 
     public function authenticate(Request $request)
     {
+        if(Auth::check()) {
+            return back();
+        }
+
         $credentials = $request->validate([
             'username' => 'required|alpha_dash',
             'password' => ['required'],
@@ -49,6 +57,10 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        if(!Auth::check()) {
+            return redirect('/');
+        }
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
@@ -58,6 +70,10 @@ class AuthController extends Controller
 
     public function registerView()
     {
+        if(Auth::check()) {
+            return back();
+        }
+
         $kelasList = \App\Models\Kelas::all();
         $jurusanList = \App\Models\Jurusan::all();
 
@@ -66,6 +82,10 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        if(Auth::check()) {
+            return back();
+        }
+
         // Validasi input untuk siswa
         $request->validate([
             'name' => ['required', 'string'],

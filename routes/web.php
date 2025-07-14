@@ -22,9 +22,9 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 
 Route::get('/dashboard', function () {
     return view('pages.dashboard');
-});
+})->middleware('role,admin,guru,siswa');
 
-// Routes for Guru
+// Routes for guru
 Route::resource('guru', GuruController::class);
 Route::get('/guru', [GuruController::class, 'index'])->name('guru.index');
 Route::get('/guru/create', [GuruController::class, 'create'])->name('guru.create');
