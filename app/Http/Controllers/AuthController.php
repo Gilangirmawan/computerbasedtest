@@ -29,6 +29,11 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'username' => 'required|alpha_dash',
             'password' => ['required'],
+        ],[
+            'username.required' => 'Username wajib diisi',
+            'username.username' => 'Username yang anda masukan salah',
+            'password.required' => 'Password wajib diisi',
+            'password.password' => 'Password yang anda masukan salah',
         ]);
 
         if (Auth::attempt($credentials)) {
@@ -36,12 +41,14 @@ class AuthController extends Controller
             $userStatus = Auth::user()->status;
             // dd(Auth::user());
             if($userStatus == 'submitted') {
-                Auth::logout();
+                $this->_logout($request);
+                // Auth::logout();
                 return back()->withErrors([
                     'username' => 'Akun Anda belum disetujui. Silakan tunggu konfirmasi dari admin.',
                 ]);
             }else if ($userStatus == 'rejected') {
-                Auth::logout();
+                $this->_logout($request);
+                // Auth::logout();
                 return back()->withErrors([
                     'username' => 'Akun Anda telah ditolak. Silakan hubungi admin untuk informasi lebih lanjut.',
                 ]);
@@ -55,15 +62,20 @@ class AuthController extends Controller
         ])->onlyInput('username');
     }
 
+    public function _logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+    }
+
     public function logout(Request $request)
     {
         if(!Auth::check()) {
             return redirect('/');
         }
 
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $this->_logout($request);
  
         return redirect('/');
     }
