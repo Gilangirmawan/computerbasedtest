@@ -1,3 +1,101 @@
+@php
+    $menus = [
+        1 =>  [
+            (object) [
+                'title' => 'Dashboard',
+                'path' => 'dashboard',
+                'icon' => 'fas fa-fw fa-tachometer-alt',
+            ],
+            (object) [
+                'title' => 'Guru',
+                'path' => 'guru',
+                'icon' => 'fas fa-fw fa-table',
+            ],
+            (object) [
+                'title' => 'Siswa',
+                'path' => 'siswa',
+                'icon' => 'fas fa-fw fa-table',
+            ],
+            (object) [
+                'title' => 'Mata Pelajaran',
+                'path' => 'mapel',
+                'icon' => 'fas fa-fw fa-table',
+            ],(object) [
+                'title' => 'Jurusan',
+                'path' => 'jurusan',
+                'icon' => 'fas fa-fw fa-table',
+            ],
+            (object) [
+                'title' => 'Kelas',
+                'path' => 'kelas',
+                'icon' => 'fas fa-fw fa-table',
+            ],
+        ],
+        2 =>  [
+            (object) [
+                'title' => 'Dashboard',
+                'path' => 'dashboard',
+                'icon' => 'fas fa-fw fa-tachometer-alt',
+            ],
+            // (object) [
+            //     'title' => 'Guru',
+            //     'path' => 'guru',
+            //     'icon' => 'fas fa-fw fa-table',
+            // ],
+            // (object) [
+            //     'title' => 'Siswa',
+            //     'path' => 'siswa',
+            //     'icon' => 'fas fa-fw fa-table',
+            // ],
+            // (object) [
+            //     'title' => 'Mata Pelajaran',
+            //     'path' => 'mapel',
+            //     'icon' => 'fas fa-fw fa-table',
+            // ],(object) [
+            //     'title' => 'Jurusan',
+            //     'path' => 'jurusan',
+            //     'icon' => 'fas fa-fw fa-table',
+            // ],
+            // (object) [
+            //     'title' => 'Kelas',
+            //     'path' => 'kelas',
+            //     'icon' => 'fas fa-fw fa-table',
+            // ],
+        ],
+        3 =>  [
+            (object) [
+                'title' => 'Dashboard',
+                'path' => 'dashboard',
+                'icon' => 'fas fa-fw fa-tachometer-alt',
+            ],
+            // (object) [
+            //     'title' => 'Guru',
+            //     'path' => 'guru',
+            //     'icon' => 'fas fa-fw fa-table',
+            // ],
+            // (object) [
+            //     'title' => 'Siswa',
+            //     'path' => 'siswa',
+            //     'icon' => 'fas fa-fw fa-table',
+            // ],
+            // (object) [
+            //     'title' => 'Mata Pelajaran',
+            //     'path' => 'mapel',
+            //     'icon' => 'fas fa-fw fa-table',
+            // ],(object) [
+            //     'title' => 'Jurusan',
+            //     'path' => 'jurusan',
+            //     'icon' => 'fas fa-fw fa-table',
+            // ],
+            // (object) [
+            //     'title' => 'Kelas',
+            //     'path' => 'kelas',
+            //     'icon' => 'fas fa-fw fa-table',
+            // ],
+        ],
+    ];
+@endphp
+
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
@@ -12,54 +110,30 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
+            {{-- <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
                 <a class="nav-link" href="/dashboard">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
                     <span>Dashboard</span></a>
-            </li>
+            </li> --}}
 
             <!-- Divider -->
-            <hr class="sidebar-divider">
+            {{-- <hr class="sidebar-divider"> --}}
 
             <!-- Heading -->
-            <div class="sidebar-heading">
+            {{-- <div class="sidebar-heading">
                 Manajemen Data
-            </div>
+            </div> --}}
 
             <!-- Nav Item - Tables -->
-            <li class="nav-item {{ request()->is('guru') ? 'active' : '' }}">
-                <a class="nav-link" href="/guru">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Guru</span></a>
+            @foreach ($menus[auth()->user()->role_id] as $menu)
+            <li class="nav-item {{ request()->is($menu->path.'*') ? 'active' : '' }}">
+                <a class="nav-link" href="/{{$menu->path}}">
+                    <i class="{{ $menu->icon }}"></i>
+                    <span>{{ $menu->title }}</span></a>
             </li>
+            @endforeach
 
-            <!-- Nav Item - Tables -->
-            <li class="nav-item {{ request()->is('siswa') ? 'active' : '' }}">
-                <a class="nav-link" href="/siswa">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Siswa</span></a>
-            </li>
-
-            <!-- Nav Item - Tables -->
-            <li class="nav-item {{ request()->is('mapel') ? 'active' : '' }}">
-                <a class="nav-link" href="/mapel">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Mata Pelajaran</span></a>
-            </li>
-
-            <!-- Nav Item - Tables -->
-            <li class="nav-item {{ request()->is('jurusan') ? 'active' : '' }}">
-                <a class="nav-link" href="/jurusan">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Jurusan</span></a>
-            </li>
-
-            <!-- Nav Item - Tables -->
-            <li class="nav-item {{ request()->is('kelas') ? 'active' : '' }}">
-                <a class="nav-link" href="/kelas">
-                    <i class="fas fa-fw fa-table"></i>
-                    <span>Kelas</span></a>
-            </li>
+            
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
