@@ -37,11 +37,11 @@
                 'path' => 'dashboard',
                 'icon' => 'fas fa-fw fa-tachometer-alt',
             ],
-            // (object) [
-            //     'title' => 'Guru',
-            //     'path' => 'guru',
-            //     'icon' => 'fas fa-fw fa-table',
-            // ],
+            (object) [
+                'title' => 'Bank Soal',
+                'path' => 'banksoal',
+                'icon' => 'fas fa-fw fa-table',
+            ],
             // (object) [
             //     'title' => 'Siswa',
             //     'path' => 'siswa',

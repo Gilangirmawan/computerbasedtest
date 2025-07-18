@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BankSoalController;
 use App\Http\Controllers\SiswaStatusController;
 use App\Http\Controllers\MapelController;
 use App\Http\Controllers\JurusanController;
@@ -72,4 +73,16 @@ Route::middleware('role:admin')->group(function(){
     Route::get('/kelas/edit/{id}', [KelasController::class, 'edit'])->name('kelas.edit');
     Route::put('/kelas/{id}', [KelasController::class, 'update'])->name('kelas.update');
     Route::delete('/kelas/delete/{id}', [KelasController::class, 'delete'])->name('kelas.delete');
+});
+
+
+//route fitur guru
+Route::middleware('role:guru')->group(function(){
+    Route::resource('banksoal', BankSoalController::class);
+    Route::get('/banksoal', [BankSoalController::class, 'index'])->name('banksoal.index');
+    Route::get('/banksoal/create', [BankSoalController::class, 'create'])->name('banksoal.create');
+    Route::post('/banksoal/create', [BankSoalController::class, 'tambah'])->name('banksoal.tambah');
+    Route::get('/banksoal/edit/{id}', [BankSoalController::class, 'edit'])->name('banksoal.edit');
+    Route::put('/banksoal/{id}', [BankSoalController::class, 'update'])->name('banksoal.update');
+    Route::delete('/banksoal/delete/{id}', [BankSoalController::class, 'delete'])->name('banksoal.delete');
 });
