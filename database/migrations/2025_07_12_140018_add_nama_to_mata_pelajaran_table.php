@@ -11,15 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-         Schema::table('mapel', function (Blueprint $table) {
-            $table->string('nama')->after('id');
-        });
+         
     }
 
     public function down()
     {
-        Schema::table('mapel', function (Blueprint $table) {
-            $table->dropColumn('nama');
-        });
+        
     }
 };

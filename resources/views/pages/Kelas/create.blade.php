@@ -15,6 +15,16 @@
             @enderror
         </div>
 
+        <div class="form-group">
+            <label for="jurusan_id">Pilih Jurusan</label>
+            <select name="jurusan_id" name="jurusan_id" id="jurusan_id" class="form-control" required>
+                <option value="">-- Pilih Jurusan --</option>
+                @foreach($jurusanList as $jurusan)
+                    <option value="{{ $jurusan->kode_jurusan }}">{{ $jurusan->nama }}</option>
+                @endforeach
+            </select>
+        </div>
+
         <button type="submit" class="btn btn-success">Simpan</button>
         <a href="{{ route('kelas.index') }}" class="btn btn-secondary">Batal</a>
     </form>

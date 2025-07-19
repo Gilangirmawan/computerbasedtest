@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('guru', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->nullable()->after('id');
+         Schema::table('guru', function (Blueprint $table) {
+            if (!Schema::hasColumn('guru', 'user_id')) {
+                $table->unsignedBigInteger('user_id')->nullable()->after('id');
+                // Jika perlu foreign key:
+                // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            }
         });
     }
 
@@ -22,7 +26,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('guru', function (Blueprint $table) {
-            //
+            if (Schema::hasColumn('guru', 'user_id')) {
+                $table->dropColumn('user_id');
+            }
         });
     }
 };

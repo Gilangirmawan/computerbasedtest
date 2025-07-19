@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('kelas', function (Blueprint $table) {
             $table->id(); // primary key auto increment
             $table->string('kelas'); // nama kelas
+            $table->string('jurusan_id'); // harus ada kolom ini
             $table->timestamps(); // created_at & updated_at
         });
     }

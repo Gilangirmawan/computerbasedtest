@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('siswa', function (Blueprint $table) {
-            if (Schema::hasColumn('siswa', 'status')) {
-                $table->dropColumn('status');
+        Schema::table('kelas', function (Blueprint $table) {
+            if (!Schema::hasColumn('kelas', 'jurusan_id')) {
+                $table->string('jurusan_id')->after('kelas');
             }
         });
     }
@@ -23,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('siswa', function (Blueprint $table) {
-            //
+        Schema::table('kelas', function (Blueprint $table) {
+            if (Schema::hasColumn('kelas', 'jurusan_id')) {
+                $table->dropColumn('jurusan_id');
+            }
         });
     }
 };

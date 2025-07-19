@@ -34,7 +34,7 @@ return new class extends Migration
             $table->timestamp('tgl_input')->useCurrent();
 
             // Relasi (optional jika tabel guru/mapel/kode guru tersedia)
-            $table->foreign('id_guru')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('id_guru')->references('id')->on('guru')->onDelete('cascade');
             $table->foreign('id_mapel')->references('id')->on('mapel')->onDelete('cascade');
         });
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Kelas;
+Use App\Models\Jurusan;
 
 class KelasController extends Controller
 {
@@ -18,19 +19,26 @@ class KelasController extends Controller
     // Tampilkan form tambah kelas
     public function create()
     {
-        return view('pages.kelas.create');
+        $jurusanList = Jurusan::all(); // Ambil semua jurusan
+
+        return view('pages.kelas.create', compact('jurusanList'));
+
     }
 
     // Simpan kelas baru
     public function tambah(Request $request)
     {
         $request->validate([
-            'kelas' => 'required|string|max:100',
-        ]);
+        'kelas' => 'required|string',
+        'jurusan_id' => 'required|exists:jurusan,kode_jurusan'
+    ]);
+// dd($request->all());
 
-        Kelas::create([
-            'kelas' => $request->input('kelas'),
-        ]);
+    Kelas::create([
+        'kelas' => $request->kelas,
+        'jurusan_id' => $request->jurusan_id,
+    ]);
+    $jurusanList = Jurusan::all();
 
         return redirect()->route('kelas.index')->with('success', 'Kelas berhasil ditambahkan.');
     }
@@ -38,6 +46,7 @@ class KelasController extends Controller
     // Tampilkan form edit kelas
     public function edit($id)
     {
+        $jurusanList = Jurusan::all();
         $kelas = Kelas::findOrFail($id);
         return view('pages.kelas.edit',[
             'kelas'=> $kelas,

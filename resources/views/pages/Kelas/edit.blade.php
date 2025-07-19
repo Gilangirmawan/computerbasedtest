@@ -20,6 +20,16 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
+                    <div class="mb-3"> 
+                        <label for="jurusan_id">Jurusan</label>
+                            <select name="jurusan_id" required>
+                                <option value="">-- Pilih Jurusan --</option>
+                                @foreach ($jurusanList as $jurusan)
+                                    <option value="{{ $jurusan->kode_jurusan }}">{{ $jurusan->nama }}</option>
+                                @endforeach
+                            </select>
+                    </div>
                     <button type="submit" class="btn btn-primary">Update</button>
                 </form>
             </div>

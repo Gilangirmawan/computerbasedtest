@@ -31,12 +31,7 @@ class GuruController extends Controller
         'nama' => 'required',
     ]);
 
-    // Simpan ke tabel guru
-    $guru = new Guru();
-    $guru->nip = $request->nip;
-    $guru->nama = $request->nama;
-    $guru->save();
-
+    
     // Simpan juga ke tabel users (untuk login)
     $user = new User();
     $user->username = $request->nip;
@@ -45,7 +40,14 @@ class GuruController extends Controller
     $user->role_id = 2; // role untuk guru
     $user->status = 'approved';
     $user->save();
-
+    
+    // Simpan ke tabel guru
+    $guru = new Guru();
+    $guru->nip = $request->nip;
+    $guru->nama = $request->nama;
+    $guru->user_id = $user->id;
+    $guru->save();
+    
     return redirect()->route('guru.index')->with('success', 'Guru berhasil ditambahkan.');
     }
 
