@@ -15,10 +15,12 @@ class BankSoalController extends Controller
     // Menampilkan daftar soal
     public function index()
     {
+        $soal = Soal::with('kelas.jurusan')->first();
+// dd($soal->kelas->jurusan->nama ?? 'Jurusan tidak ditemukan');
         // Ambil data soal yang dimiliki oleh guru yang sedang login
-        $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
+        $guru = Guru::where('user_id', Auth::id())->first();
 
-        $soalList = Soal::where('id_guru', $guru->id)->get();
+        $soalList = Soal::with(['kelas.jurusan', 'mapel'])->get();
 
         return view('pages.banksoal.index', compact('soalList'));
     }

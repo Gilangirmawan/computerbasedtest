@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Jurusan;
 use Illuminate\Database\Eloquent\Model;
 
 class Kelas extends Model

@@ -32,7 +32,12 @@
                                     <tr>
                                         <td>{{ $no + 1 }}</td>
                                         <td>{{ Str::limit(strip_tags($soal->soal), 50) }}</td>
-                                        <td>{{ $soal->kelas }}</td>
+                                        <td>
+                                            {{ $soal->kelas->kelas ?? '-' }} -
+                                            {{ $soal->kelas->jurusan->nama ?? '-' }}
+                                        </td>
+
+
                                         <td>{{ $soal->mapel->nama ?? '-' }}</td>
                                         <td>{{ $soal->jawaban }}</td>
                                         <td>
@@ -43,12 +48,16 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{ route('banksoal.edit', $soal->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                                            <a href="{{ route('banksoal.edit', $soal->id) }}" class="btn btn-sm btn-warning">Edit
+                                                <i class="fas fa-pen"></i>
+                                            </a>
                                             <form action="{{ route('banksoal.delete', $soal->id) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-danger"
-                                                    onclick="return confirm('Hapus soal ini?')">Hapus</button>
+                                                    onclick="return confirm('Hapus soal ini?')">Hapus
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
                                             </form>
                                         </td>
                                     </tr>

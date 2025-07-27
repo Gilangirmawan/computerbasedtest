@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Kelas;
+
 
 class Soal extends Model
 {
@@ -41,6 +43,6 @@ class Soal extends Model
     //Jika kamu punya model Kelas, bisa gunakan ini:
     public function kelas()
     {
-        return $this->belongsTo(Kelas::class, 'kelas_id');
+        return $this->belongsTo(Kelas::class, 'kelas', 'kelas');
     }
 }
