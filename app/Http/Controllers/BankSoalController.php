@@ -84,7 +84,7 @@ class BankSoalController extends Controller
     public function edit($id)
     {
         $soal = Soal::findOrFail($id);
-        $mapel = Mapel::all();
+        $mapel = Mapel::all(); // Ini nama variabel harus $mapel, bukan $mapelList
         $kelas = Kelas::all();
 
         return view('pages.banksoal.edit', compact('soal', 'mapel', 'kelas'));
@@ -94,33 +94,40 @@ class BankSoalController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'pertanyaan' => 'required|string',
+            'soal' => 'required|string',
             'gambar' => 'nullable|image|max:2048',
-            'pilihan_a' => 'required|string',
-            'pilihan_b' => 'required|string',
-            'pilihan_c' => 'required|string',
-            'pilihan_d' => 'required|string',
-            'jawaban_benar' => 'required|in:A,B,C,D',
-            'kelas_id' => 'required|exists:kelas,id',
-            'mapel_id' => 'required|exists:mapel,id',
+            'opsi_a' => 'required|string',
+            'opsi_b' => 'required|string',
+            'opsi_c' => 'required|string',
+            'opsi_d' => 'required|string',
+            'jawaban' => 'required|in:A,B,C,D,E',
+            'kelas' => 'required',
+            'id_mapel' => 'required|exists:mapel,id',
         ]);
 
         $soal = Soal::findOrFail($id);
-        $soal->fill($request->only([
-            'pertanyaan', 'pilihan_a', 'pilihan_b', 'pilihan_c', 'pilihan_d',
-            'jawaban_benar', 'kelas_id', 'mapel_id'
-        ]));
+        $soal->soal = $request->soal;
+        $soal->opsi_a = $request->opsi_a;
+        $soal->opsi_b = $request->opsi_b;
+        $soal->opsi_c = $request->opsi_c;
+        $soal->opsi_d = $request->opsi_d;
+        $soal->opsi_e = $request->opsi_e;
+        $soal->jawaban = $request->jawaban;
+        $soal->kelas = $request->kelas;
+        $soal->id_mapel = $request->id_mapel;
 
-        if ($request->hasFile('gambar')) {
-            $file = $request->file('gambar');
+        // Simpan file jika ada
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
             $namaFile = uniqid() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('gambar_soal'), $namaFile);
-            $soal->gambar = $namaFile;
+            $file->move(public_path('storage/soal'), $namaFile);
+            $soal->file = 'soal/' . $namaFile;
+            $soal->tipe_file = $file->getClientMimeType();
         }
 
         $soal->save();
 
-        return redirect()->route('pages.banksoal.index')->with('success', 'Soal berhasil diperbarui');
+        return redirect()->route('banksoal.index')->with('success', 'Soal berhasil diperbarui.');
     }
 
     // Hapus soal
@@ -134,6 +141,6 @@ class BankSoalController extends Controller
 
         $soal->delete();
 
-        return redirect()->route('pages.banksoal.index')->with('success', 'Soal berhasil dihapus');
+        return redirect()->route('banksoal.index')->with('success', 'Soal berhasil dihapus');
     }
 }
