@@ -26,9 +26,10 @@ class BankSoalController extends Controller
     // Form tambah soal
     public function create()
     {
-        $mapel = Mapel::all();
-        $kelas = Kelas::with('jurusan')->get();
-        return view('pages.banksoal.create', compact('mapel','kelas'));
+        $mapelList = Mapel::orderBy('nama')->get();
+        $kelasList = Kelas::with('jurusan')->orderBy('kelas')->get();
+
+        return view('pages.banksoal.create', compact('mapelList', 'kelasList'));
     }
 
     // Simpan soal baru

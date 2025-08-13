@@ -42,11 +42,11 @@
                 'path' => 'banksoal',
                 'icon' => 'fas fa-fw fa-table',
             ],
-            // (object) [
-            //     'title' => 'Siswa',
-            //     'path' => 'siswa',
-            //     'icon' => 'fas fa-fw fa-table',
-            // ],
+            (object) [
+                'title' => 'Ujian',
+                'path' => 'ujian',
+                'icon' => 'fas fa-fw fa-table',
+            ],
             // (object) [
             //     'title' => 'Mata Pelajaran',
             //     'path' => 'mapel',

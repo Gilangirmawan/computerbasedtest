@@ -15,64 +15,68 @@
       </div>
     @endif
     <form action="{{ route('banksoal.tambah') }}" method="POST" enctype="multipart/form-data">
-        @csrf
+    @csrf
 
-        <div class="mb-3">
-            <label for="id_mapel" class="form-label">Mata Pelajaran</label>
-            <select name="id_mapel" id="id_mapel" class="form-select" required>
-                <option value="">-- Pilih Mapel --</option>
-                @foreach($mapelList as $mapel)
-                    <option value="{{ $mapel->id }}">{{ $mapel->nama }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label for="kelas_id" class="form-label">Kelas</label>
-                <select name="kelas_id" class="form-control" required>
-                <option value="">-- Pilih Kelas --</option>
-                @foreach($kelas as $k)
-                    <option value="{{ $k->id }}" {{ old('kelas_id', $soal->kelas_id ?? null) == $k->id ? 'selected' : '' }}>
-                    {{ $k->kelas }}{{ $k->jurusan ? ' - '.$k->jurusan->nama : '' }}
-                    </option>
-                @endforeach
-                </select>
-                @error('kelas_id') <small class="text-danger">{{ $message }}</small> @enderror
-        </div>
-
-        <div class="mb-3">
-            <label for="soal" class="form-label">Soal</label>
-            <textarea name="soal" id="soal" class="form-control" rows="3" required></textarea>
-        </div>
-
-        @foreach(['a', 'b', 'c', 'd', 'e'] as $opt)
-        <div class="mb-3">
-            <label for="opsi_{{ $opt }}" class="form-label">Opsi {{ strtoupper($opt) }}</label>
-            <input type="text" name="opsi_{{ $opt }}" id="opsi_{{ $opt }}" class="form-control" required>
-        </div>
+    <div class="mb-3">
+        <label class="form-label">Mata Pelajaran</label>
+        <select name="id_mapel" class="form-control" required>
+        <option value="">-- Pilih Mapel --</option>
+        @foreach ($mapelList as $mapel)
+            <option value="{{ $mapel->id }}" {{ old('id_mapel') == $mapel->id ? 'selected' : '' }}>
+            {{ $mapel->nama }}
+            </option>
         @endforeach
+        </select>
+        @error('id_mapel') <small class="text-danger">{{ $message }}</small> @enderror
+    </div>
 
+    <div class="mb-3">
+        <label class="form-label">Kelas</label>
+        {{-- gunakan kelas_id jika tabel soal sudah memakai FK kelas_id --}}
+        <select name="kelas_id" class="form-control" required>
+        <option value="">-- Pilih Kelas --</option>
+        @foreach ($kelasList as $k)
+            <option value="{{ $k->id }}" {{ old('kelas_id') == $k->id ? 'selected' : '' }}>
+            {{ $k->kelas }}{{ $k->jurusan ? ' - '.$k->jurusan->nama : '' }}
+            </option>
+        @endforeach
+        </select>
+        @error('kelas_id') <small class="text-danger">{{ $message }}</small> @enderror
+    </div>
+
+    {{-- field lain: soal, opsi_a..e, jawaban, file --}}
+    <div class="mb-3">
+        <label class="form-label">Soal</label>
+        <textarea name="soal" class="form-control" required>{{ old('soal') }}</textarea>
+        @error('soal') <small class="text-danger">{{ $message }}</small> @enderror
+    </div>
+
+    @foreach(['a','b','c','d','e'] as $opt)
         <div class="mb-3">
-            <label for="jawaban" class="form-label">Jawaban Benar</label>
-            <select name="jawaban" id="jawaban" class="form-select" required>
-                <option value="">-- Pilih Jawaban --</option>
-                @foreach(['A', 'B', 'C', 'D', 'E'] as $opt)
-                    <option value="{{ $opt }}">{{ $opt }}</option>
-                @endforeach
-            </select>
+        <label class="form-label">Opsi {{ strtoupper($opt) }}</label>
+        <input type="text" name="opsi_{{ $opt }}" value="{{ old('opsi_'.$opt) }}" class="form-control" @if($opt !== 'e') required @endif>
+        @error('opsi_'.$opt) <small class="text-danger">{{ $message }}</small> @enderror
         </div>
+    @endforeach
 
-        <div class="mb-3">
-            <label for="file" class="form-label">File (Opsional)</label>
-            <input type="file" name="file" id="file" class="form-control" accept=".jpg,.jpeg,.png,.pdf,.docx">
-        </div>
+    <div class="mb-3">
+        <label class="form-label">Jawaban Benar</label>
+        <select name="jawaban" class="form-control" required>
+        <option value="">-- Pilih --</option>
+        @foreach(['A','B','C','D','E'] as $j)
+            <option value="{{ $j }}" {{ old('jawaban') == $j ? 'selected' : '' }}>{{ $j }}</option>
+        @endforeach
+        </select>
+        @error('jawaban') <small class="text-danger">{{ $message }}</small> @enderror
+    </div>
 
-        <div class="mb-3">
-            <label for="tipe_file" class="form-label">Tipe File</label>
-            <input type="text" name="tipe_file" id="tipe_file" class="form-control">
-        </div>
+    <div class="mb-3">
+        <label class="form-label">File (opsional)</label>
+        <input type="file" name="file" class="form-control">
+        @error('file') <small class="text-danger">{{ $message }}</small> @enderror
+    </div>
 
-        <button type="submit" class="btn btn-primary">Simpan Soal</button>
+    <button type="submit" class="btn btn-primary">Simpan</button>
     </form>
 </div>
 @endsection
