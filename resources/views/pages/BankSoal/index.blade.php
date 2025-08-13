@@ -33,11 +33,10 @@
                                         <td>{{ $no + 1 }}</td>
                                         <td>{{ Str::limit(strip_tags($soal->soal), 50) }}</td>
                                         <td>
-                                            {{ $soal->kelas->kelas ?? '-' }} -
+                                            {{ $soal->kelas->kelas ?? '-' }}
+                                            -
                                             {{ $soal->kelas->jurusan->nama ?? '-' }}
                                         </td>
-
-
                                         <td>{{ $soal->mapel->nama ?? '-' }}</td>
                                         <td>{{ $soal->jawaban }}</td>
                                         <td>

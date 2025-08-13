@@ -18,13 +18,16 @@
         </div>
 
         <div class="mb-3">
-            <label for="kelas" class="form-label">Kelas</label>
-            <select name="kelas" class="form-control" required>
+            <label for="kelas_id" class="form-label">Kelas</label>
+                <select name="kelas_id" class="form-control" required>
                 <option value="">-- Pilih Kelas --</option>
                 @foreach($kelas as $k)
-                    <option value="{{ $k->kelas }}" {{ $soal->kelas == $k->kelas ? 'selected' : '' }}>{{ $k->kelas }} - {{ $k->jurusan->nama ?? '' }}</option>
+                    <option value="{{ $k->id }}" {{ old('kelas_id', $soal->kelas_id ?? null) == $k->id ? 'selected' : '' }}>
+                    {{ $k->kelas }}{{ $k->jurusan ? ' - '.$k->jurusan->nama : '' }}
+                    </option>
                 @endforeach
-            </select>
+                </select>
+                @error('kelas_id') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
         <div class="mb-3">

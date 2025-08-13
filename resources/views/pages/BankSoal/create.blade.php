@@ -3,6 +3,17 @@
 @section('content')
 <div class="container">
     <h3 class="mb-4">Tambah Soal</h3>
+    {{-- Pesan error validasi --}}
+    @if ($errors->any())
+      <div class="alert alert-danger">
+        <strong>Gagal menyimpan:</strong>
+        <ul class="mb-0">
+          @foreach ($errors->all() as $e)
+            <li>{{ $e }}</li>
+          @endforeach
+        </ul>
+      </div>
+    @endif
     <form action="{{ route('banksoal.tambah') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
@@ -17,15 +28,16 @@
         </div>
 
         <div class="mb-3">
-            <label for="kelas" class="form-label">Pilih Kelas</label>
-            <select name="kelas" id="kelas" class="form-select" required>
+            <label for="kelas_id" class="form-label">Kelas</label>
+                <select name="kelas_id" class="form-control" required>
                 <option value="">-- Pilih Kelas --</option>
-                @foreach($kelasList as $kelas)
-                    <option value="{{ $kelas->kelas }}">
-                        {{ $kelas->kelas }} - {{ $kelas->jurusan->nama ?? 'Jurusan tidak tersedia' }}
+                @foreach($kelas as $k)
+                    <option value="{{ $k->id }}" {{ old('kelas_id', $soal->kelas_id ?? null) == $k->id ? 'selected' : '' }}>
+                    {{ $k->kelas }}{{ $k->jurusan ? ' - '.$k->jurusan->nama : '' }}
                     </option>
                 @endforeach
-            </select>
+                </select>
+                @error('kelas_id') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
 
         <div class="mb-3">
