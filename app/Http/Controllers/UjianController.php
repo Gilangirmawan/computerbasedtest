@@ -109,7 +109,7 @@ class UjianController extends Controller
     }
 
     // Ganti dari 'delete' -> 'destroy'
-    public function destroy($id)
+    public function delete($id)
     {
         $ujian = Ujian::findOrFail($id);
         $ujian->delete();

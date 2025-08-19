@@ -18,7 +18,7 @@
       <table class="table table-bordered table-hover align-middle">
         <thead class="table-light">
           <tr>
-            <th>#</th>
+            <th>No</th>
             <th>Nama Ujian</th>
             <th>Mapel</th>
             <th>Kelas - Jurusan</th>
@@ -48,12 +48,13 @@
               <td><code>{{ $u->token }}</code></td>
               <td class="text-capitalize">{{ $u->jenis }}</td>
               <td>
-                <a href="{{ route('ujian.edit', $u->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                <form action="{{ route('ujian.destroy', $u->id) }}" method="POST" class="d-inline"
+                <a href="{{ route('ujian.edit', $u->id) }}" class="btn btn-sm btn-warning">
+                  <i class="fas fa-pencil-alt"></i> Edit</a>
+                <form action="{{ route('ujian.delete', $u->id) }}" method="POST" class="d-inline"
                       onsubmit="return confirm('Hapus ujian ini?')">
                   @csrf
                   @method('DELETE')
-                  <button class="btn btn-sm btn-danger">Hapus</button>
+                  <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
                 </form>
               </td>
             </tr>
