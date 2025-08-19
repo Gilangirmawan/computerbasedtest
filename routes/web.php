@@ -9,6 +9,7 @@ use App\Http\Controllers\SiswaStatusController;
 use App\Http\Controllers\MapelController;
 use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\KelasController;
+use App\Http\Controllers\UjianController;
 use App\Models\Jurusan;
 use App\Models\Kelas;
 use App\Models\Mapel;
@@ -85,4 +86,13 @@ Route::middleware('role:guru')->group(function(){
     Route::get('/banksoal/edit/{id}', [BankSoalController::class, 'edit'])->name('banksoal.edit');
     Route::put('/banksoal/{id}', [BankSoalController::class, 'update'])->name('banksoal.update');
     Route::delete('/banksoal/delete/{id}', [BankSoalController::class, 'delete'])->name('banksoal.delete');
+
+    // Route Ujian
+    Route::resource('ujian', UjianController::class);
+    Route::get('/ujian', [UjianController::class, 'index'])->name('ujian.index');
+    Route::get('/ujian/create', [UjianController::class, 'create'])->name('ujian.create');
+    Route::post('/ujian/create', [UjianController::class, 'tambah'])->name('ujian.tambah');
+    Route::get('/ujian/edit/{id}', [UjianController::class, 'edit'])->name('ujian.edit');
+    Route::put('/ujian/{id}', [UjianController::class, 'update'])->name('ujian.update');
+    Route::delete('/ujian/delete/{id}', [UjianController::class, 'delete'])->name('ujian.delete');
 });
