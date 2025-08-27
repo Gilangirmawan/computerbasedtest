@@ -21,6 +21,7 @@
             <th>No</th>
             <th>Nama Ujian</th>
             <th>Mapel</th>
+            <th>Paket</th>
             <th>Kelas - Jurusan</th>
             <th>Mulai</th>
             <th>Durasi (menit)</th>
@@ -35,6 +36,7 @@
               <td>{{ $i+1 }}</td>
               <td>{{ $u->nama_ujian }}</td>
               <td>{{ $u->mapel->nama ?? '-' }}</td>
+              <td>{{ $u->soal_count }}</td>
               <td>
                 {{ $u->kelas->kelas ?? '-' }}
                 @if(optional($u->kelas)->jurusan)
@@ -48,6 +50,9 @@
               <td><code>{{ $u->token }}</code></td>
               <td class="text-capitalize">{{ $u->jenis }}</td>
               <td>
+                {{-- <a href="{{ route('ujian.detail', $u->id) }}" class="btn btn-sm btn-success">
+                  <i class="fas fa-search"></i> Lihat Detail
+                </a> --}}
                 <a href="{{ route('ujian.edit', $u->id) }}" class="btn btn-sm btn-warning">
                   <i class="fas fa-pencil-alt"></i> Edit</a>
                 <form action="{{ route('ujian.delete', $u->id) }}" method="POST" class="d-inline"

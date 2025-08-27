@@ -189,6 +189,70 @@
         </div>
       </div>
 
+      <hr class="my-4">
+
+        {{-- Bagian 5: Paket Soal (Bank Soal Mapel) --}}
+        {{-- <div class="mb-3 section-title">Paket Soal (Mapel: {{ $ujian->mapel->nama ?? '-' }})</div>
+
+        @php --}}
+            //ID soal yang sudah terpilih pada ujian saat ini
+            {{-- $selected = $ujian->soals->pluck('id')->toArray();
+        @endphp --}}
+
+        {{-- <div class="border rounded p-3" style="max-height: 380px; overflow: auto;">
+            @forelse($bankSoal as $s)
+                <div class="form-check d-flex align-items-start gap-2 mb-2">
+                <input class="form-check-input mt-1"
+                        type="checkbox"
+                        name="soal_ids[]"
+                        value="{{ $s->id }}"
+                        id="soal{{ $s->id }}"
+                        {{ in_array($s->id, $selected) ? 'checked' : '' }}>
+
+                <label class="form-check-label" for="soal{{ $s->id }}">
+                    <span class="text-muted">#{{ $s->id }}</span>
+                    {!! \Illuminate\Support\Str::limit(strip_tags($s->soal), 140) !!}
+                </label> --}}
+
+                {{-- (Opsional) Kolom urutan: aktifkan hanya jika pivot punya kolom "urutan" --}}
+                {{-- <input type="number"
+                        name="urutan[{{ $s->id }}]"
+                        class="form-control form-control-sm ms-auto"
+                        style="width: 90px;"
+                        placeholder="Urut"
+                        value="{{ optional($ujian->soals->firstWhere('id',$s->id))->pivot->urutan }}"> --}}
+                {{-- </div>
+            @empty
+                <div class="text-muted">Belum ada bank soal untuk mapel ini.</div>
+            @endforelse
+        </div> --}}
+
+        @php
+          $paketIds = $ujian->soal()->pluck('soal.id')->toArray();
+        @endphp
+
+        <div id="blok-pilih-soal" class="mt-3" style="display: {{ $ujian->jenis==='set' ? '' : 'none' }};">
+          <label class="form-label">Pilih Soal (Mode Set)</label>
+          <div class="border rounded p-2" style="max-height: 260px; overflow:auto;">
+            @foreach($soalPool ?? [] as $s)
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="soal_ids[]"
+                      value="{{ $s->id }}" id="soal{{ $s->id }}"
+                      {{ in_array($s->id, $paketIds) ? 'checked' : '' }}>
+                <label class="form-check-label" for="soal{{ $s->id }}">
+                  {{ Str::limit($s->soal, 80) }} — (Kelas {{ $s->kelas->kelas ?? '-' }}, {{ $s->mapel->nama ?? '-' }})
+                </label>
+              </div>
+            @endforeach
+          </div>
+
+          <div class="form-check mt-2">
+            <input type="checkbox" class="form-check-input" id="refresh_paket" name="refresh_paket" value="1">
+            <label class="form-check-label" for="refresh_paket">Segarkan paket soal saat simpan</label>
+          </div>
+        </div>
+
+
       <div class="mt-4 d-flex gap-2">
         <button class="btn btn-primary">
           <i class="fas fa-save mr-1"></i> Simpan Perubahan

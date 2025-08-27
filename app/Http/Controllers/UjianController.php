@@ -9,13 +9,19 @@ use App\Models\Guru;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Models\Soal;
 
 class UjianController extends Controller
 {
     public function index()
     {
         // eager load sampai jurusan agar tampil di tabel
-        $ujianList = Ujian::with(['mapel', 'kelas.jurusan'])->latest()->get();
+        // $ujianList = Ujian::with(['mapel', 'kelas.jurusan'])->latest()->get();
+
+        $ujianList = Ujian::with(['mapel','kelas.jurusan','soal'])
+                    ->withCount('soal')
+                    ->get();
+
         return view('pages.ujian.index', compact('ujianList'));
     }
 
@@ -24,7 +30,14 @@ class UjianController extends Controller
         $mapelList = Mapel::all();
         $kelasList = Kelas::with('jurusan')->get();
 
-        return view('pages.ujian.create', compact('mapelList', 'kelasList'));
+        $mapelList = Mapel::all();
+        $kelasList = Kelas::with('jurusan')->get();
+
+        // pool awal (opsional): batasi 100
+        $soalPool  = \App\Models\Soal::with(['mapel','kelas.jurusan'])
+                    ->latest('id')->take(100)->get();
+
+        return view('pages.ujian.create', compact('mapelList', 'kelasList', 'soalPool'));
     }
 
     // Ganti dari 'tambah' -> 'store'
@@ -47,7 +60,7 @@ class UjianController extends Controller
         $ujian->waktu        = $durasi;
         $ujian->jenis        = $data['jenis'];
         $ujian->waktu_mulai   = $mulai;
-        $ujian->waktu_selesai = $mulai->copy()->addMinutes($durasi);
+        $ujian->waktu_selesai = $mulai->copy()->addMinutes($durasi); // tambahkan ini
         $ujian->terlambat     = $terlambat;
         $ujian->token         = $data['token'];
 
@@ -61,6 +74,26 @@ class UjianController extends Controller
         }
 
         $ujian->save();
+        // --- Bekukan paket soal untuk ujian ini ---
+
+        $soalIds = collect($request->input('soal_ids', []))->map(fn($v)=>(int)$v);
+        $soalIds = collect($request->input('soal_ids', []))->map(fn($v)=>(int)$v);
+
+        if ($request->jenis === 'acak' || $soalIds->isEmpty()) {
+            // Ambil acak sesuai mapel & kelas
+            $soalIds = Soal::where('id_mapel', $ujian->id_mapel)
+                ->where('kelas_id', $ujian->kelas_id)
+                ->inRandomOrder()
+                ->limit((int)$ujian->jumlah_soal)
+                ->pluck('id');
+        }
+
+        // siapkan payload pivot: urutan + bobot default 1
+        $attach = [];
+        foreach ($soalIds as $i => $id) {
+            $attach[$id] = ['urutan' => $i+1, 'bobot' => 1];
+        }
+        $ujian->soal()->sync($attach);   // bekukan paket  
 
         return redirect()->route('ujian.index')->with('success', 'Ujian berhasil ditambahkan');
     }
@@ -70,8 +103,13 @@ class UjianController extends Controller
         $ujian     = Ujian::findOrFail($id);
         $mapelList = Mapel::all();
         $kelasList = Kelas::with('jurusan')->get();
+        $ujian = Ujian::with('soal')->findOrFail($id);
+        $mapelList = Mapel::all();
+        $kelasList = Kelas::with('jurusan')->get();
+        $soalPool  = \App\Models\Soal::with(['mapel','kelas.jurusan'])
+                    ->latest('id')->take(150)->get();
 
-        return view('pages.ujian.edit', compact('ujian', 'mapelList', 'kelasList'));
+        return view('pages.ujian.edit', compact('ujian', 'mapelList', 'kelasList', 'soalPool'));
     }
 
     public function update(Request $request, $id)
@@ -104,6 +142,24 @@ class UjianController extends Controller
         }
 
         $ujian->save();
+
+        if ($request->boolean('refresh_paket')) {
+            $soalIds = collect($request->input('soal_ids', []))->map(fn($v)=>(int)$v);
+
+            if ($ujian->jenis === 'acak' || $soalIds->isEmpty()) {
+                $soalIds = \App\Models\Soal::where('id_mapel', $ujian->id_mapel)
+                    ->where('kelas_id', $ujian->kelas_id)
+                    ->inRandomOrder()
+                    ->limit((int)$ujian->jumlah_soal)
+                    ->pluck('id');
+            }
+
+            $attach = [];
+            foreach ($soalIds as $i => $id) {
+                $attach[$id] = ['urutan' => $i+1, 'bobot' => 1];
+            }
+            $ujian->soal()->sync($attach);
+        }
 
         return redirect()->route('ujian.index')->with('success', 'Ujian berhasil diperbarui');
     }

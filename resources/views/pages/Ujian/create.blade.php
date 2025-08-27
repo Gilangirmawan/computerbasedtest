@@ -185,6 +185,26 @@
         </div>
       </div>
 
+      {{-- Pilih Soal (muncul saat jenis = set) --}}
+      <div id="blok-pilih-soal" class="mt-3" style="display:none;">
+        <label class="form-label">Pilih Soal (Mode Set)</label>
+        <div class="border rounded p-2" style="max-height: 260px; overflow:auto;">
+          @foreach($soalPool ?? [] as $s)
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="soal_ids[]"
+                    value="{{ $s->id }}" id="soal{{ $s->id }}">
+              <label class="form-check-label" for="soal{{ $s->id }}">
+                {{ Str::limit($s->soal, 80) }} — (Kelas {{ $s->kelas->kelas ?? '-' }}, {{ $s->mapel->nama ?? '-' }})
+              </label>
+            </div>
+          @endforeach
+          @if(empty($soalPool) || count($soalPool)===0)
+            <div class="text-muted small">Soal akan ditarik otomatis (acak) karena pool kosong.</div>
+          @endif
+        </div>
+        <div class="form-text">Jika tidak memilih, sistem akan mengacak sesuai Mapel & Kelas.</div>
+      </div>
+
       <div class="mt-4 d-flex gap-2">
         <button class="btn btn-primary">
           <i class="fas fa-save mr-1"></i> Simpan

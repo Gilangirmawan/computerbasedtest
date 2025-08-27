@@ -79,7 +79,7 @@ Route::middleware('role:admin')->group(function(){
 
 //route fitur guru
 Route::middleware('role:guru')->group(function(){
-    Route::resource('banksoal', BankSoalController::class);
+    // Route::resource('banksoal', BankSoalController::class);
     Route::get('/banksoal', [BankSoalController::class, 'index'])->name('banksoal.index');
     Route::get('/banksoal/create', [BankSoalController::class, 'create'])->name('banksoal.create');
     Route::post('/banksoal/create', [BankSoalController::class, 'tambah'])->name('banksoal.tambah');
@@ -95,4 +95,12 @@ Route::middleware('role:guru')->group(function(){
     Route::get('/ujian/edit/{id}', [UjianController::class, 'edit'])->name('ujian.edit');
     Route::put('/ujian/{id}', [UjianController::class, 'update'])->name('ujian.update');
     Route::delete('/ujian/delete/{id}', [UjianController::class, 'delete'])->name('ujian.delete');
+
+    // 🚨 Ganti path detail jadi /ujian/{ujian}/detail supaya tidak bentrok dengan pola /ujian/{id} milik resource
+    // Route::get('/ujian/{ujian}/detail', [UjianController::class, 'detail'])->name('ujian.detail');
 });
+
+// Route Fitur Siswa
+// Route::middleware('role:siswa')->group(function(){
+//     Route::get('/ujian', [UjianController::class, 'index'])->name('ujian.index');
+// });

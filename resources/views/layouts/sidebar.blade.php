@@ -47,20 +47,6 @@
                 'path' => 'ujian',
                 'icon' => 'fas fa-fw fa-table',
             ],
-            // (object) [
-            //     'title' => 'Mata Pelajaran',
-            //     'path' => 'mapel',
-            //     'icon' => 'fas fa-fw fa-table',
-            // ],(object) [
-            //     'title' => 'Jurusan',
-            //     'path' => 'jurusan',
-            //     'icon' => 'fas fa-fw fa-table',
-            // ],
-            // (object) [
-            //     'title' => 'Kelas',
-            //     'path' => 'kelas',
-            //     'icon' => 'fas fa-fw fa-table',
-            // ],
         ],
         3 =>  [
             (object) [
@@ -68,30 +54,11 @@
                 'path' => 'dashboard',
                 'icon' => 'fas fa-fw fa-tachometer-alt',
             ],
-            // (object) [
-            //     'title' => 'Guru',
-            //     'path' => 'guru',
-            //     'icon' => 'fas fa-fw fa-table',
-            // ],
-            // (object) [
-            //     'title' => 'Siswa',
-            //     'path' => 'siswa',
-            //     'icon' => 'fas fa-fw fa-table',
-            // ],
-            // (object) [
-            //     'title' => 'Mata Pelajaran',
-            //     'path' => 'mapel',
-            //     'icon' => 'fas fa-fw fa-table',
-            // ],(object) [
-            //     'title' => 'Jurusan',
-            //     'path' => 'jurusan',
-            //     'icon' => 'fas fa-fw fa-table',
-            // ],
-            // (object) [
-            //     'title' => 'Kelas',
-            //     'path' => 'kelas',
-            //     'icon' => 'fas fa-fw fa-table',
-            // ],
+            (object) [
+                'title' => 'Ikut Ujian',
+                'path' => 'ikut_ujian',
+                'icon' => 'fas fa-fw fa-table',
+            ],
         ],
     ];
 @endphp

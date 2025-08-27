@@ -45,4 +45,10 @@ class Soal extends Model
     {
         return $this->belongsTo(Kelas::class, 'kelas_id');
     }
+
+    public function ujian() {
+        return $this->belongsToMany(Ujian::class, 'paket_soal', 'id_soal', 'id_ujian')
+                    ->withPivot(['urutan','bobot'])
+                    ->withTimestamps();
+    }
 }

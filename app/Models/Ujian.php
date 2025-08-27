@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\PaketSoal;
+
 
 class Ujian extends Model
 {
@@ -26,5 +28,17 @@ class Ujian extends Model
     public function guru()
     {
         return $this->belongsTo(Guru::class, 'id_guru');
+    }
+
+    public function soal()
+    {
+        return $this->belongsToMany(Soal::class, 'paket_soal', 'id_ujian', 'id_soal')
+                    ->withPivot(['urutan', 'bobot'])
+                    ->withTimestamps();
+    }
+
+    public function paketSoal()
+    {
+        return $this->hasMany(\App\Models\PaketSoal::class, 'id_ujian', 'id');
     }
 }
