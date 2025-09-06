@@ -51,4 +51,9 @@ class Soal extends Model
                     ->withPivot(['urutan','bobot'])
                     ->withTimestamps();
     }
+
+    public function jawaban()
+    {
+        return $this->hasMany(Jawaban::class, 'id_soal');
+    }
 }

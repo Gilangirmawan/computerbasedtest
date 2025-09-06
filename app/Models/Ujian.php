@@ -41,4 +41,9 @@ class Ujian extends Model
     {
         return $this->hasMany(\App\Models\PaketSoal::class, 'id_ujian', 'id');
     }
+
+    public function jawaban()
+    {
+        return $this->hasMany(Jawaban::class, 'id_ujian');
+    }
 }

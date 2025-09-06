@@ -10,6 +10,7 @@ use App\Http\Controllers\MapelController;
 use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\UjianController;
+use App\Http\Controllers\IkutUjianController;
 use App\Models\Jurusan;
 use App\Models\Kelas;
 use App\Models\Mapel;
@@ -100,7 +101,14 @@ Route::middleware('role:guru')->group(function(){
     // Route::get('/ujian/{ujian}/detail', [UjianController::class, 'detail'])->name('ujian.detail');
 });
 
-// Route Fitur Siswa
-// Route::middleware('role:siswa')->group(function(){
-//     Route::get('/ujian', [UjianController::class, 'index'])->name('ujian.index');
-// });
+// routes siswa
+Route::middleware('role:siswa')->group(function () {
+    Route::get('/ikut_ujian', [UjianController::class, 'index'])->name('ikutujian.index');
+    Route::get('/ikut_ujian', [IkutUjianController::class, 'daftar'])->name('ikutujian.daftar');
+    Route::post('/ikut_ujian/cek-token', [IkutUjianController::class, 'cekToken'])->name('ikutujian.cekToken');
+    Route::get('/ikut_ujian/{id}/mulai', [IkutUjianController::class, 'mulai'])->name('ikutujian.mulai');
+    Route::post('/ikut_ujian/{id}/selesai', [IkutUjianController::class, 'selesaiUjian'])->name('ikutujian.selesai');
+
+    // route simpan jawaban
+    Route::post('/jawaban/simpan', [IkutUjianController::class, 'simpanJawaban'])->name('jawaban.simpan');
+});

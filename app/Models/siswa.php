@@ -31,4 +31,9 @@ class siswa extends Model
     {
          return $this->belongsTo(Jurusan::class,'jurusan_id', 'kode_jurusan'); // jika pakai kode_jurusan
     }
+
+    public function jawaban()
+    {
+        return $this->hasMany(Jawaban::class, 'id_siswa');
+    }
 }

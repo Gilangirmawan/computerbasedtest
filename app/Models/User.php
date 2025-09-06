@@ -49,6 +49,7 @@ class User extends Authenticatable
 
     public function siswa()
     {
-        return $this->hasOne(\App\Models\Siswa::class);
+        // Sesuaikan 'Siswa::class' dan 'user_id' jika nama model atau foreign key Anda berbeda
+        return $this->hasOne(Siswa::class, 'user_id');
     }
 }
