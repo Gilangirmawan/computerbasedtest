@@ -16,7 +16,8 @@
         @csrf
 
         @foreach($soals as $key => $soal)
-            <div class="mb-4 p-3 border rounded bg-light">
+            <div class="mb-4 p-3 border rounded bg-light soal-item">
+                {{-- Tampilkan gambar soal jika ada --}}
                 <p><b>{{ $key+1 }}. {{ $soal->soal }}</b></p>
 
                 @foreach(['a','b','c','d','e'] as $opsi)
@@ -35,7 +36,7 @@
                 @endforeach
             </div>
         @endforeach
-
+            <div class="d-flex justify-content-center mt-4" id="pagination-controls"></div>
         <button type="button" class="btn btn-success" id="btnSelesaiUjian">
             Selesai Ujian
         </button>
@@ -130,4 +131,72 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const soalItems = document.querySelectorAll('.soal-item');
+    const paginationControls = document.getElementById('pagination-controls');
+    const soalPerPage = 5; // Tampilkan 5 soal per halaman
+    const pageCount = Math.ceil(soalItems.length / soalPerPage);
+    let currentPage = 1;
+
+    function showPage(page) {
+        // Sembunyikan semua soal terlebih dahulu
+        soalItems.forEach(item => item.style.display = 'none');
+
+        const startIndex = (page - 1) * soalPerPage;
+        const endIndex = startIndex + soalPerPage;
+
+        // Tampilkan hanya soal untuk halaman yang aktif
+        for (let i = startIndex; i < endIndex && i < soalItems.length; i++) {
+            soalItems[i].style.display = 'block';
+        }
+
+        // Perbarui tombol paginasi yang aktif
+        updateActiveButton(page);
+    }
+
+    function createPaginationButtons() {
+        if (pageCount <= 1) return; // Jangan buat tombol jika hanya 1 halaman
+
+        const prevButton = document.createElement('button');
+        prevButton.type = 'button';
+        prevButton.className = 'btn btn-outline-primary me-2';
+        prevButton.innerHTML = '&laquo; Sebelumnya';
+        prevButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        });
+        paginationControls.appendChild(prevButton);
+
+        const nextButton = document.createElement('button');
+        nextButton.type = 'button';
+        nextButton.className = 'btn btn-outline-primary';
+        nextButton.innerHTML = 'Selanjutnya &raquo;';
+        nextButton.addEventListener('click', () => {
+            if (currentPage < pageCount) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        });
+        paginationControls.appendChild(nextButton);
+    }
+
+    function updateActiveButton(page) {
+        // Di sini Anda bisa menambahkan logika untuk menonaktifkan tombol 'Sebelumnya' atau 'Selanjutnya'
+        const prevButton = paginationControls.querySelector('button:first-child');
+        const nextButton = paginationControls.querySelector('button:last-child');
+        
+        if (prevButton) prevButton.disabled = (page === 1);
+        if (nextButton) nextButton.disabled = (page === pageCount);
+    }
+
+    // Inisialisasi
+    createPaginationButtons();
+    showPage(currentPage);
+});
+</script>
+
 @endsection

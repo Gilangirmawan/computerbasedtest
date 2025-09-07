@@ -57,7 +57,7 @@
             (object) [
                 'title' => 'Ikut Ujian',
                 'path' => 'ikut_ujian',
-                'icon' => 'fas fa-fw fa-table',
+                'icon' => 'fas fa-book-open',
             ],
         ],
     ];

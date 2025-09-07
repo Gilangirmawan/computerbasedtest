@@ -83,45 +83,47 @@
     </div>
 
     {{-- Daftar ujian --}}
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr class="text-center">
-                <th>Nama Ujian</th>
-                <th>Mata Pelajaran</th>
-                <th>Durasi</th>
-                <th>Waktu Mulai</th>
-                <th>Waktu Selesai</th>
-                <th>Token</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($ujian as $ujian)
-            <tr>
-                <td>{{ $ujian->nama_ujian }}</td>
-                <td>{{ $ujian->mapel->nama ?? '-' }}</td>
-                <td class="text-center">{{ $ujian->waktu }} menit</td>
-                <td>{{ $ujian->waktu_mulai }}</td>
-                <td>{{ $ujian->waktu_selesai }}</td>
-                <td>
-                    <form method="POST" action="{{ route('ikutujian.cekToken') }}">
-                        @csrf
-                        <input type="hidden" name="id_ujian" value="{{ $ujian->id }}">
-                        <input type="text" name="token" class="form-control" placeholder="Masukkan Token" required>
-                </td>
-                <td>
-                        <button type="submit" class="btn btn-sm btn-primary">
-                            Ikut Ujian
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="6" class="text-center">Belum ada ujian tersedia.</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr class="text-center">
+                    <th>Nama Ujian</th>
+                    <th>Mata Pelajaran</th>
+                    <th>Durasi</th>
+                    <th>Waktu Mulai</th>
+                    <th>Waktu Selesai</th>
+                    <th>Token</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($ujian as $ujian)
+                <tr>
+                    <td>{{ $ujian->nama_ujian }}</td>
+                    <td>{{ $ujian->mapel->nama ?? '-' }}</td>
+                    <td class="text-center">{{ $ujian->waktu }} menit</td>
+                    <td>{{ $ujian->waktu_mulai }}</td>
+                    <td>{{ $ujian->waktu_selesai }}</td>
+                    <td>
+                        <form method="POST" action="{{ route('ikutujian.cekToken') }}">
+                            @csrf
+                            <input type="hidden" name="id_ujian" value="{{ $ujian->id }}">
+                            <input type="text" name="token" class="form-control" placeholder="Masukkan Token" required>
+                    </td>
+                    <td>
+                            <button type="submit" class="btn btn-sm btn-primary"><i class="fas fa-sign-in-alt"></i>
+                                Ikut Ujian
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="6" class="text-center">Belum ada ujian tersedia.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 </div>
 @endsection

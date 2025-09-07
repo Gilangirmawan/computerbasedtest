@@ -24,7 +24,8 @@ class siswa extends Model
 
     public function kelas()
     {
-        return $this->belongsTo(Kelas::class);
+        // Definisikan foreign key secara eksplisit untuk memastikan relasi benar
+        return $this->belongsTo(Kelas::class, 'kelas_id');
     }
 
     public function jurusan()
