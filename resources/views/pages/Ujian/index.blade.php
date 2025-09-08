@@ -50,21 +50,30 @@
               <td><code>{{ $u->token }}</code></td>
               <td class="text-capitalize">{{ $u->jenis }}</td>
               <td>
-                {{-- <a href="{{ route('ujian.detail', $u->id) }}" class="btn btn-sm btn-success">
-                  <i class="fas fa-search"></i> Lihat Detail
-                </a> --}}
-                <a href="{{ route('ujian.edit', $u->id) }}" class="btn btn-sm btn-warning">
-                  <i class="fas fa-pencil-alt"></i> Edit</a>
-                <form action="{{ route('ujian.delete', $u->id) }}" method="POST" class="d-inline"
-                      onsubmit="return confirm('Hapus ujian ini?')">
-                  @csrf
-                  @method('DELETE')
-                  <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
-                </form>
+                @php
+                    // Ambil profil guru dari user yang sedang login
+                    $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
+                @endphp
+            
+                @if ($guru && $u->id_guru == $guru->id)
+                    {{-- Jika guru yang login adalah pembuat ujian, tampilkan tombol --}}
+                    <a href="{{ route('ujian.edit', $u->id) }}" class="btn btn-sm btn-warning">
+                        <i class="fas fa-pencil-alt"></i> Edit
+                    </a>
+                    <form action="{{ route('ujian.delete', $u->id) }}" method="POST" class="d-inline"
+                            onsubmit="return confirm('Hapus ujian ini?')">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                    </form>
+                @else
+                    {{-- Jika bukan, tampilkan nama pembuatnya --}}
+                    <span class="badge bg-secondary">Dibuat oleh: {{ $u->guru->name ?? 'N/A' }}</span>
+                @endif
               </td>
             </tr>
           @empty
-            <tr><td colspan="9" class="text-center text-muted">Belum ada data.</td></tr>
+            <tr><td colspan="10" class="text-center text-muted">Belum ada data.</td></tr>
           @endforelse
         </tbody>
       </table>

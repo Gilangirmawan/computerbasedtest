@@ -18,8 +18,9 @@ class UjianController extends Controller
         // eager load sampai jurusan agar tampil di tabel
         // $ujianList = Ujian::with(['mapel', 'kelas.jurusan'])->latest()->get();
 
-        $ujianList = Ujian::with(['mapel','kelas.jurusan','soal'])
+        $ujianList = Ujian::with(['mapel','kelas.jurusan','soal', 'guru'])
                     ->withCount('soal')
+                    ->orderBy('id', 'desc')
                     ->get();
 
         return view('pages.ujian.index', compact('ujianList'));
@@ -45,6 +46,19 @@ class UjianController extends Controller
     {
         $data = $this->validated($request);
 
+        // =================================================================
+        // PERBAIKAN UTAMA DI SINI
+        // 1. Ambil profil guru terlebih dahulu
+        $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
+
+        // 2. Tambahkan pengecekan: jika profil guru tidak ada, hentikan proses
+        if (!$guru) {
+            return redirect()->back()
+                ->withErrors(['msg' => 'Gagal menyimpan ujian. Profil guru untuk pengguna ini tidak ditemukan.'])
+                ->withInput();
+        }
+        // =================================================================
+
         $mulai     = Carbon::createFromFormat('Y-m-d\TH:i', $data['waktu_mulai']);
         $durasi    = (int) $data['waktu'];
         $terlambat = isset($data['terlambat']) && $data['terlambat']
@@ -60,27 +74,22 @@ class UjianController extends Controller
         $ujian->waktu        = $durasi;
         $ujian->jenis        = $data['jenis'];
         $ujian->waktu_mulai   = $mulai;
-        $ujian->waktu_selesai = $mulai->copy()->addMinutes($durasi); // tambahkan ini
+        $ujian->waktu_selesai = $mulai->copy()->addMinutes($durasi);
         $ujian->terlambat     = $terlambat;
         $ujian->token         = $data['token'];
-
-        // PILIH SALAH SATU (sesuai FK di tabel ujian):
-        // Jika ujian.id_guru -> users.id:
-        // $ujian->id_guru = Auth::id();
-
-        // Jika ujian.id_guru -> guru.id:
-        if ($guruId = Guru::where('user_id', Auth::id())->value('id')) {
-            $ujian->id_guru = $guruId;
+        
+        $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
+        if (!$guru) {
+            return redirect()->back()->withErrors(['msg' => 'Gagal menyimpan ujian. Profil guru tidak ditemukan.'])->withInput();
         }
+        $ujian->id_guru = $guru->id;
 
         $ujian->save();
+        
         // --- Bekukan paket soal untuk ujian ini ---
-
-        $soalIds = collect($request->input('soal_ids', []))->map(fn($v)=>(int)$v);
         $soalIds = collect($request->input('soal_ids', []))->map(fn($v)=>(int)$v);
 
         if ($request->jenis === 'acak' || $soalIds->isEmpty()) {
-            // Ambil acak sesuai mapel & kelas
             $soalIds = Soal::where('id_mapel', $ujian->id_mapel)
                 ->where('kelas_id', $ujian->kelas_id)
                 ->inRandomOrder()
@@ -88,12 +97,11 @@ class UjianController extends Controller
                 ->pluck('id');
         }
 
-        // siapkan payload pivot: urutan + bobot default 1
         $attach = [];
         foreach ($soalIds as $i => $id) {
             $attach[$id] = ['urutan' => $i+1, 'bobot' => 1];
         }
-        $ujian->soal()->sync($attach);   // bekukan paket  
+        $ujian->soal()->sync($attach);
 
         return redirect()->route('ujian.index')->with('success', 'Ujian berhasil ditambahkan');
     }

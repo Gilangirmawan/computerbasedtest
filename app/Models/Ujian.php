@@ -27,7 +27,9 @@ class Ujian extends Model
 
     public function guru()
     {
-        return $this->belongsTo(Guru::class, 'id_guru');
+        // Asumsi: 'id_guru' di tabel ujian terhubung dengan 'id' di tabel users
+        return $this->belongsTo(\App\Models\User::class, 'id_guru');
+        // return $this->belongsTo(Guru::class, 'id_guru');
     }
 
     public function soal()

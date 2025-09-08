@@ -66,11 +66,33 @@ class IkutUjianController extends Controller
 
         $ujian = Ujian::findOrFail($request->id_ujian);
 
+        // 1. Validasi token terlebih dahulu
         if ($request->token !== $ujian->token) {
-            // GANTI baris withErrors menjadi with('error', ...)
             return back()->with('error', 'Token yang Anda masukkan salah, silakan coba lagi!');
         }
 
+        // =================================================================
+        // PENAMBAHAN: Cek apakah siswa sudah pernah menyelesaikan ujian ini
+        // =================================================================
+        $user = Auth::user();
+        $profilSiswa = \App\Models\Siswa::where('user_id', $user->id)->first();
+
+        // Jika profil siswa tidak ditemukan (sebagai penjaga keamanan)
+        if (!$profilSiswa) {
+            return back()->with('error', 'Gagal memvalidasi, profil siswa Anda tidak ditemukan.');
+        }
+
+        // Cek di tabel 'ikut_ujian'
+        $sudahSelesai = IkutUjian::where('id_ujian', $ujian->id)
+                                   ->where('id_siswa', $profilSiswa->id)
+                                   ->exists(); // Cukup periksa apakah datanya ada
+
+        if ($sudahSelesai) {
+            return back()->with('error', 'Anda sudah menyelesaikan ujian "' . $ujian->nama_ujian . '" dan tidak dapat mengerjakannya kembali.');
+        }
+        // =================================================================
+
+        // Jika semua pengecekan lolos, izinkan masuk ke halaman ujian
         return redirect()->route('ikutujian.mulai', $ujian->id);
     }
 
@@ -137,81 +159,58 @@ class IkutUjianController extends Controller
     }
 
     // Selesai ujian → simpan semua jawaban & nilai
-   public function selesaiUjian(Request $request, $idUjian)
+    public function selesaiUjian(Request $request, $idUjian)
     {
-        //  dd(Auth::user());
-        // =================================================================
-        // SOLUSI UTAMA: Periksa otentikasi pengguna di awal.
-        // Ini adalah cara paling aman untuk memastikan kita memiliki data siswa.
-        // =================================================================
         $user = Auth::user();
 
-        if (!Auth::check()) {
-            return redirect()->route('login')
-                ->with('swal_error', 'Sesi Anda telah berakhir. Silakan login kembali untuk melihat hasil ujian.');
+        if (!$user) {
+            return redirect()->route('login')->with('error', 'Sesi Anda telah berakhir.');
         }
 
-        // Jika user ada, kita aman untuk mendapatkan ID-nya.
-        $idSiswa = $user->id;
-        // =================================================================
-        // AKHIR DARI SOLUSI
-        // =================================================================
+        $profilSiswa = \App\Models\Siswa::where('user_id', $user->id)->first();
 
+        if (!$profilSiswa) {
+            return redirect()->route('ikutujian.daftar')
+                ->with('error', 'Gagal menyimpan jawaban. Profil siswa tidak ditemukan.');
+        }
 
-        // Simpan jawaban
+        $idSiswa = $profilSiswa->id;
+
+        // 1. Simpan semua jawaban ke tabel 'jawaban'
         $answers = $request->input('jawaban', []);
         foreach ($answers as $idSoal => $pilihan) {
             Jawaban::updateOrCreate(
-                [
-                    'id_ujian' => $idUjian,
-                    'id_siswa' => $idSiswa,
-                    'id_soal'  => $idSoal,
-                ],
-                [
-                    'jawaban'  => $pilihan,
-                ]
+                ['id_ujian' => $idUjian, 'id_siswa' => $idSiswa, 'id_soal' => $idSoal],
+                ['jawaban'  => $pilihan]
             );
         }
 
-        // Ambil jawaban siswa
-        $jawabanSiswa = Jawaban::where('id_ujian', $idUjian)
-            ->where('id_siswa', $idSiswa)
-            ->get();
-
-        // Hitung nilai
+        // 2. Hitung nilai berdasarkan jawaban yang baru disimpan
+        $jawabanSiswa = Jawaban::where('id_ujian', $idUjian)->where('id_siswa', $idSiswa)->get();
         $benar = 0;
-            foreach ($jawabanSiswa as $jwb) {
-                $soal = Soal::find($jwb->id_soal);
-                
-                // Periksa apakah jawaban siswa ada dan soalnya ditemukan
-                if ($soal && $jwb->jawaban !== null) {
-                    // Bersihkan kunci jawaban dan jawaban siswa sebelum membandingkan
-                    $kunciJawabanBersih = trim(strtolower($soal->jawaban));
-                    $jawabanSiswaBersih = trim(strtolower($jwb->jawaban));
-
-                    if ($kunciJawabanBersih === $jawabanSiswaBersih) {
-                        $benar++;
-                        $jwb->is_benar = true;
-                    } else {
-                        $jwb->is_benar = false;
-                    }
+        foreach ($jawabanSiswa as $jwb) {
+            $soal = Soal::find($jwb->id_soal);
+            if ($soal && $jwb->jawaban !== null) {
+                if (trim(strtolower($soal->jawaban)) === trim(strtolower($jwb->jawaban))) {
+                    $benar++;
+                    $jwb->is_benar = true;
                 } else {
-                    // Jika siswa tidak menjawab atau soal tidak ada, anggap salah
                     $jwb->is_benar = false;
                 }
-                $jwb->save();
+            } else {
+                $jwb->is_benar = false;
             }
-
+            $jwb->save();
+        }
         $jumlahSoal = $jawabanSiswa->count();
-        // Hindari pembagian dengan nol jika tidak ada jawaban sama sekali
         $nilai = ($jumlahSoal > 0) ? ($benar / $jumlahSoal) * 100 : 0;
 
-        // Simpan ringkasan ke ikut_ujian
+        // =================================================================
+        // 3. (BAGIAN KRUSIAL) Simpan ringkasan ke tabel 'ikut_ujian'
+        // Pastikan nama kolom 'id_siswa' di sini merujuk ke tabel 'siswa'
+        // =================================================================
         IkutUjian::updateOrCreate(
-            [
-                'id_ujian' => $idUjian,
-                'id_siswa' => $idSiswa,
-            ],
+            ['id_ujian' => $idUjian, 'id_siswa' => $idSiswa],
             [
                 'jml_benar'   => $benar,
                 'nilai'       => $nilai,
@@ -219,8 +218,9 @@ class IkutUjianController extends Controller
                 'status'      => 'selesai',
             ]
         );
+        // =================================================================
 
         return redirect()->route('ikutujian.daftar')
-            ->with('success', 'Ujian selesai. Nilai Anda: ' . number_format($nilai, 2));
+            ->with('success', 'Ujian telah berhasil diselesaikan. Silakan tunggu informasi selanjutnya dari guru Anda.');
     }
 }

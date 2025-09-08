@@ -40,12 +40,12 @@
             (object) [
                 'title' => 'Bank Soal',
                 'path' => 'banksoal',
-                'icon' => 'fas fa-fw fa-table',
+                'icon' => 'fas fa-book',
             ],
             (object) [
                 'title' => 'Ujian',
                 'path' => 'ujian',
-                'icon' => 'fas fa-fw fa-table',
+                'icon' => 'fas fa-graduation-cap',
             ],
         ],
         3 =>  [

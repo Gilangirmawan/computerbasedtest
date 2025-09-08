@@ -30,7 +30,8 @@
                             <tbody>
                                 @forelse($soalList as $no => $soal)
                                     <tr>
-                                        <td>{{ $no + 1 }}</td>
+                                        {{-- PERBAIKAN DI SINI: Menggunakan firstItem() untuk penomoran yang benar --}}
+                                        <td>{{ $soalList->firstItem() + $no }}</td>
                                         <td>{{ Str::limit(strip_tags($soal->soal), 50) }}</td>
                                         <td>
                                             {{ $soal->kelas->kelas ?? '-' }}
@@ -46,18 +47,26 @@
                                                 <span class="text-muted">Tidak ada</span>
                                             @endif
                                         </td>
-                                        <td>
-                                            <a href="{{ route('banksoal.edit', $soal->id) }}" class="btn btn-sm btn-warning">Edit
-                                                <i class="fas fa-pen"></i>
-                                            </a>
-                                            <form action="{{ route('banksoal.delete', $soal->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger"
-                                                    onclick="return confirm('Hapus soal ini?')">Hapus
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
+                                       <td>
+                                            @php
+                                                // Ambil profil guru dari user yang sedang login
+                                                $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
+                                            @endphp
+                                            
+                                            @if ($guru && $soal->id_guru == $guru->id)
+                                                <a href="{{ route('banksoal.edit', $soal->id) }}" class="btn btn-sm btn-warning">
+                                                    Edit <i class="fas fa-pen"></i>
+                                                </a>
+                                                <form action="{{ route('banksoal.delete', $soal->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Hapus soal ini?')">
+                                                        Hapus <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <span class="badge bg-secondary">Dibuat oleh: {{ $soal->guru->name ?? 'N/A' }}</span>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
@@ -67,6 +76,12 @@
                                 @endforelse
                             </tbody>
                         </table>
+
+                        {{-- Menampilkan tombol paginasi --}}
+                        <div class="d-flex justify-content-center">
+                            {{ $soalList->links() }}
+                        </div>
+                        
                     </div>
                 </div>
             </div>

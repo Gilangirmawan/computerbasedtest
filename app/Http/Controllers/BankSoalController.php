@@ -16,9 +16,9 @@ class BankSoalController extends Controller
     // Menampilkan daftar soal
     public function index()
     {
-        $soalList = Soal::with(['mapel','kelas.jurusan'])
-            ->orderByDesc('tgl_input')
-            ->get();
+        $soalList = Soal::with(['mapel','kelas.jurusan', 'guru'])
+                        ->orderByDesc('tgl_input')
+                        ->paginate(10);
 
         return view('pages.banksoal.index', compact('soalList'));
     }
@@ -48,9 +48,22 @@ class BankSoalController extends Controller
             'file'     => 'nullable|file|max:4096',
         ]);
 
+        // =================================================================
+        // PERBAIKAN UTAMA DI SINI
+        // 1. Ambil profil guru
+        $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
+
+        // 2. Tambahkan pengecekan: jika profil guru tidak ada, hentikan proses
+        if (!$guru) {
+            return redirect()->back()
+                ->withErrors(['msg' => 'Gagal menyimpan soal. Profil guru untuk pengguna ini tidak ditemukan.'])
+                ->withInput();
+        }
+        // =================================================================
+
         $soal = new Soal();
         $soal->id_mapel = $request->id_mapel;
-        $soal->kelas_id = $request->kelas_id; // << penting
+        $soal->kelas_id = $request->kelas_id;
         $soal->soal     = $request->soal;
         $soal->opsi_a   = $request->opsi_a;
         $soal->opsi_b   = $request->opsi_b;
@@ -58,8 +71,9 @@ class BankSoalController extends Controller
         $soal->opsi_d   = $request->opsi_d;
         $soal->opsi_e   = $request->opsi_e;
         $soal->jawaban  = $request->jawaban;
-        $guru = Guru::where('user_id', Auth::id())->first();
-        $soal->id_guru  = $guru ? $guru->id : null;
+        
+        // 3. Simpan id guru yang sudah pasti ada
+        $soal->id_guru  = $guru->id;
 
         // upload file (opsional)
         if ($request->hasFile('file')) {
