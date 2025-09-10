@@ -40,7 +40,7 @@
             (object) [
                 'title' => 'Bank Soal',
                 'path' => 'banksoal',
-                'icon' => 'fas fa-book',
+                'icon' => 'fas fa-database',
             ],
             (object) [
                 'title' => 'Ujian',

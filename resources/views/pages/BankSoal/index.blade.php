@@ -17,7 +17,7 @@
                     <div class="table-responsive">
                         <table class="table table-bordered table-hover">
                             <thead class="table-primary">
-                                <tr>
+                                <tr class="text-center">
                                     <th>No</th>
                                     <th>Soal</th>
                                     <th>Kelas</th>
@@ -29,7 +29,7 @@
                             </thead>
                             <tbody>
                                 @forelse($soalList as $no => $soal)
-                                    <tr>
+                                    <tr class="text-center">
                                         {{-- PERBAIKAN DI SINI: Menggunakan firstItem() untuk penomoran yang benar --}}
                                         <td>{{ $soalList->firstItem() + $no }}</td>
                                         <td>{{ Str::limit(strip_tags($soal->soal), 50) }}</td>
@@ -65,7 +65,7 @@
                                                     </button>
                                                 </form>
                                             @else
-                                                <span class="badge bg-secondary">Dibuat oleh: {{ $soal->guru->name ?? 'N/A' }}</span>
+                                                <span class="badge bg-secondary text-light">Dibuat oleh: {{ $soal->guru->name ?? 'N/A' }}</span>
                                             @endif
                                         </td>
                                     </tr>

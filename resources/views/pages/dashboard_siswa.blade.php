@@ -3,7 +3,8 @@
 @section('content')
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Dashboard Siswa</h1>
+        {{-- Menggunakan data dari $profilSiswa untuk sapaan --}}
+        <h1 class="h3 mb-0 text-gray-800">Dashboard - Selamat Datang, {{ $profilSiswa->nama ?? Auth::user()->name }}!</h1>
     </div>
 
     <div class="row">
@@ -21,9 +22,6 @@
                                 <hr class="mt-2 mb-2">
                                 <div class="text-gray-600 small">
                                     <strong>NIS:</strong> {{ $profilSiswa->nis }} <br>
-                                    {{-- ====================================================== --}}
-                                    {{-- PERBAIKAN DI SINI: Mengubah ->nama menjadi ->nama_kelas --}}
-                                    {{-- ====================================================== --}}
                                     <strong>Kelas:</strong> {{ $profilSiswa->kelas->kelas ?? 'N/A' }} <br>
                                     <strong>Jurusan:</strong> {{ $profilSiswa->jurusan->nama ?? 'N/A' }}
                                 </div>
@@ -39,7 +37,7 @@
             </div>
         </div>
 
-        <!-- Card 2: Daftar Ujian Tersedia (Kode tidak berubah) -->
+        <!-- Card 2: Daftar Ujian Tersedia -->
         <div class="col-xl-8 col-md-6 mb-4">
             <div class="card border-left-success shadow h-100 py-2">
                 <div class="card-body">
@@ -82,6 +80,54 @@
                 </div>
             </div>
         </div>
+    </div>
 
+    {{-- BLOK BARU UNTUK MENAMPILKAN TABEL NILAI --}}
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Riwayat dan Nilai Ujian</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr class="text-center">
+                                    <th>Nama Ujian</th>
+                                    <th>Mata Pelajaran</th>
+                                    <th>Tanggal Selesai</th>
+                                    <th>Jumlah Benar</th>
+                                    <th>Nilai Akhir</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($riwayatUjian as $riwayat)
+                                    <tr class="text-center">
+                                        <td>{{ $riwayat->ujian->nama_ujian ?? 'Ujian Telah Dihapus' }}</td>
+                                        <td>{{ $riwayat->ujian->mapel->nama ?? 'N/A' }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($riwayat->tgl_selesai)->format('d M Y, H:i') }}</td>
+                                        <td class="text-center">{{ $riwayat->jml_benar }}</td>
+                                        <td class="text-center">
+                                            <span class="badge 
+                                                @if($riwayat->nilai >= 80) bg-success 
+                                                @elseif($riwayat->nilai >= 60) bg-warning 
+                                                @else bg-danger @endif">
+                                                {{ number_format($riwayat->nilai, 2) }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center">Anda belum memiliki riwayat ujian.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
     </div>
 @endsection

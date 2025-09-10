@@ -28,7 +28,7 @@ class DashboardController extends Controller
             
             $ujianTersedia = collect();
             $ujianSelesaiIds = []; // Default array kosong
-            
+            $riwayatUjian = collect(); // Default koleksi kosong
             if ($profilSiswa) {
                 $ujianTersedia = Ujian::with('mapel')
                     ->where('kelas_id', $profilSiswa->kelas_id)
@@ -36,18 +36,20 @@ class DashboardController extends Controller
                     ->orderBy('waktu_mulai', 'desc')
                     ->get();
                 
-                // =================================================================
-                // PERBAIKAN DI SINI:
-                // Gunakan ID dari profil siswa ($profilSiswa->id) untuk mencari di tabel IkutUjian,
-                // karena kolom 'id_siswa' di sana menyimpan ID dari tabel siswa.
-                // =================================================================
-                $semuaRiwayatUjian = IkutUjian::where('id_siswa', $profilSiswa->id)->get();
                 $ujianSelesaiIds = IkutUjian::where('id_siswa', $profilSiswa->id)
                                             ->pluck('id_ujian')
                                             ->toArray();
+                
+                // Ambil semua data dari tabel ikut_ujian beserta relasi ke ujian dan mapel
+                $riwayatUjian = IkutUjian::where('id_siswa', $profilSiswa->id)
+                                        ->with(['ujian.mapel']) // Eager loading untuk performa
+                                        ->latest('tgl_selesai') // Urutkan dari yang terbaru
+                                        ->get();
             }
+            // =================================================================
 
-            return view('pages.dashboard_siswa', compact('profilSiswa', 'ujianTersedia', 'ujianSelesaiIds'));
+            // Tambahkan '$riwayatUjian' ke dalam compact()
+            return view('pages.dashboard_siswa', compact('profilSiswa', 'ujianTersedia', 'ujianSelesaiIds', 'riwayatUjian'));
 
         } elseif ($user->role_id == 2) { // 2 = guru
             

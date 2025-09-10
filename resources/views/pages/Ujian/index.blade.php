@@ -17,7 +17,7 @@
     <div class="table-responsive">
       <table class="table table-bordered table-hover align-middle">
         <thead class="table-light">
-          <tr>
+          <tr class="text-center">
             <th>No</th>
             <th>Nama Ujian</th>
             <th>Mapel</th>
@@ -32,7 +32,7 @@
         </thead>
         <tbody>
           @forelse($ujianList as $i => $u)
-            <tr>
+            <tr class="text-center">
               <td>{{ $i+1 }}</td>
               <td>{{ $u->nama_ujian }}</td>
               <td>{{ $u->mapel->nama ?? '-' }}</td>
@@ -68,7 +68,7 @@
                     </form>
                 @else
                     {{-- Jika bukan, tampilkan nama pembuatnya --}}
-                    <span class="badge bg-secondary">Dibuat oleh: {{ $u->guru->name ?? 'N/A' }}</span>
+                    <span class="badge bg-secondary text-light">Dibuat oleh: {{ $u->guru->name ?? 'N/A' }}</span>
                 @endif
               </td>
             </tr>

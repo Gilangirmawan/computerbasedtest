@@ -98,7 +98,7 @@
             </thead>
             <tbody>
                 @forelse($ujian as $ujian)
-                <tr>
+                <tr class="text-center">
                     <td>{{ $ujian->nama_ujian }}</td>
                     <td>{{ $ujian->mapel->nama ?? '-' }}</td>
                     <td class="text-center">{{ $ujian->waktu }} menit</td>
