@@ -2,12 +2,26 @@
 
 @section('content')
     <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Data Soal</h1>
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Data Soal</h1>
+    <div>
+        <a href="{{ route('banksoal.import.create') }}" class="btn btn-sm btn-info shadow-sm">
+            <i class="fas fa-upload fa-sm text-white-50"></i> Import Soal
+        </a>
         <a href="{{ route('banksoal.create') }}" class="btn btn-sm btn-primary shadow-sm">
             <i class="fas fa-plus fa-sm text-white-50"></i> Tambah Soal
         </a>
     </div>
+</div>
+
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
 
     <!-- Tabel Soal -->
     <div class="row">

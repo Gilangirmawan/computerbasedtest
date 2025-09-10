@@ -28,6 +28,11 @@ class Soal extends Model
 
     public $timestamps = false; // karena kita pakai `tgl_input`, bukan `created_at`
 
+    public function setKelasAttribute($value)
+    {
+        $this->attributes['kelas_id'] = $value;
+    }
+
     // Relasi ke user (guru)
     public function guru()
     {

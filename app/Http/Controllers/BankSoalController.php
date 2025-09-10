@@ -10,6 +10,8 @@ Use App\Models\Guru;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Imports\SoalImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BankSoalController extends Controller
 {
@@ -149,5 +151,39 @@ class BankSoalController extends Controller
         $soal->delete();
 
         return redirect()->route('banksoal.index')->with('success', 'Soal berhasil dihapus');
+    }
+
+    public function importCreate()
+    {
+        $mapelList = Mapel::orderBy('nama')->get();
+        $kelasList = Kelas::with('jurusan')->orderBy('kelas')->get();
+        return view('pages.banksoal.import_soal', compact('mapelList', 'kelasList'));
+    }
+
+    public function importStore(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+            'id_mapel' => 'required|exists:mapel,id',
+            'kelas_id' => 'required|exists:kelas,id',
+        ]);
+
+        try {
+            $import = new SoalImport($request->id_mapel, $request->kelas_id);
+            Excel::import($import, $request->file('file'));
+
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+             $failures = $e->failures();
+             $errors = [];
+             foreach ($failures as $failure) {
+                 $errors[] = 'Baris ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+             }
+             return redirect()->route('banksoal.import.create')->with('import_errors', $errors);
+
+        } catch (\Exception $e) {
+            return redirect()->route('banksoal.import.create')->with('import_errors', ['Gagal mengimpor file: ' . $e->getMessage()]);
+        }
+
+        return redirect()->route('banksoal.index')->with('success', 'Soal berhasil diimpor!');
     }
 }

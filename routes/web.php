@@ -86,6 +86,8 @@ Route::middleware('role:guru')->group(function(){
     Route::get('/banksoal/edit/{id}', [BankSoalController::class, 'edit'])->name('banksoal.edit');
     Route::put('/banksoal/{id}', [BankSoalController::class, 'update'])->name('banksoal.update');
     Route::delete('/banksoal/delete/{id}', [BankSoalController::class, 'delete'])->name('banksoal.delete');
+    Route::get('/banksoal/import', [BankSoalController::class, 'importCreate'])->name('banksoal.import.create');
+    Route::post('/banksoal/import', [BankSoalController::class, 'importStore'])->name('banksoal.import.store');
 
     // Route Ujian
     Route::resource('ujian', UjianController::class);
