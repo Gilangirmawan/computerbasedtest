@@ -48,4 +48,9 @@ class Ujian extends Model
     {
         return $this->hasMany(Jawaban::class, 'id_ujian');
     }
+
+    public function peserta()
+    {
+        return $this->hasMany(IkutUjian::class, 'id_ujian');
+    }
 }

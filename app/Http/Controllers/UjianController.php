@@ -10,6 +10,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Models\Soal;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\HasilUjianExport;
+use App\Models\IkutUjian;
+use App\Models\Jawaban;
 
 class UjianController extends Controller
 {
@@ -103,7 +107,7 @@ class UjianController extends Controller
         }
         $ujian->soal()->sync($attach);
 
-        return redirect()->route('ujian.index')->with('success', 'Ujian berhasil ditambahkan');
+        return redirect()->route('ujian.index')->with('swal_success', 'Ujian berhasil ditambahkan');
     }
 
     public function edit($id)
@@ -169,7 +173,7 @@ class UjianController extends Controller
             $ujian->soal()->sync($attach);
         }
 
-        return redirect()->route('ujian.index')->with('success', 'Ujian berhasil diperbarui');
+        return redirect()->route('ujian.index')->with('swal_success', 'Ujian berhasil diperbarui');
     }
 
     // Ganti dari 'delete' -> 'destroy'
@@ -178,7 +182,7 @@ class UjianController extends Controller
         $ujian = Ujian::findOrFail($id);
         $ujian->delete();
 
-        return redirect()->route('ujian.index')->with('success', 'Ujian berhasil dihapus');
+        return redirect()->route('ujian.index')->with('swal_success', 'Ujian berhasil dihapus');
     }
 
     // --- DRY: satu tempat untuk rules ---
@@ -196,5 +200,113 @@ class UjianController extends Controller
             'terlambat'    => 'nullable|date_format:Y-m-d\TH:i',
             'token'        => 'required|string|max:5',
         ]);
+    }
+
+    public function detail(Ujian $ujian)
+    {
+        // Ambil profil guru yang sedang login
+        $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
+
+        // Lapis Keamanan: Pastikan guru yang login adalah pemilik ujian
+        if (!$guru || $ujian->id_guru != $guru->id) {
+            abort(403, 'ANDA TIDAK MEMILIKI AKSES KE HALAMAN INI.');
+        }
+
+        // 1. Ambil data ujian dasar dan daftar pesertanya (tanpa eager load siswa)
+        $ujian->load(['mapel', 'kelas.jurusan', 'peserta']);
+
+        $pesertaList = \App\Models\IkutUjian::where('id_ujian', $ujian->id)
+                                        ->latest('tgl_selesai') // Urutkan dari yang terbaru
+                                        ->paginate(3); // Tampilkan 3 data per halaman
+
+        // 2. Kumpulkan semua ID siswa dari daftar peserta
+        $siswaIds = $ujian->peserta->pluck('id_siswa');
+
+        // 3. Ambil semua profil siswa yang dibutuhkan, beserta relasi kelas dan jurusannya
+        $profilSiswaList = \App\Models\Siswa::with('kelas.jurusan') // Memuat relasi kelas dan jurusan
+                                ->whereIn('id', $siswaIds)
+                                ->get()
+                                ->keyBy('id'); // Gunakan ID siswa sebagai kunci array
+
+        // 4. "Suntikkan" profil siswa yang benar ke setiap data peserta
+        foreach ($ujian->peserta as $peserta) {
+            // Kita buat properti baru 'profil_siswa' untuk menyimpan data yang benar
+            if (isset($profilSiswaList[$peserta->id_siswa])) {
+                $peserta->profil_siswa = $profilSiswaList[$peserta->id_siswa];
+            } else {
+                $peserta->profil_siswa = null; // Jika profil siswa tidak ditemukan
+            }
+        }
+        return view('pages.ujian.detail', compact('ujian', 'pesertaList'));
+    }
+
+    public function export(Ujian $ujian)
+    {
+        // Lapis Keamanan: Pastikan guru yang login adalah pemilik ujian
+        $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
+        if (!$guru || $ujian->id_guru != $guru->id) {
+            abort(403, 'ANDA TIDAK MEMILIKI AKSES UNTUK MENGEKSPOR DATA INI.');
+        }
+
+        // Membuat nama file yang dinamis
+        $namaFile = 'hasil-' . \Illuminate\Support\Str::slug($ujian->nama_ujian) . '.xlsx';
+
+        // Menggunakan kelas ekspor yang sudah kita buat
+        return Excel::download(new HasilUjianExport($ujian), $namaFile);
+    }
+
+    public function lihatHasil(IkutUjian $ikutUjian)
+    {
+        // 1. Muat relasi yang tidak bermasalah (ujian dan jawaban)
+        $ikutUjian->load(['ujian', 'jawaban.soal']);
+
+        // 2. Ambil profil siswa yang benar secara manual menggunakan id_siswa
+        //    beserta relasi kelas dan jurusannya.
+        $profilSiswa = \App\Models\Siswa::with('kelas.jurusan')->find($ikutUjian->id_siswa);
+
+        // 3. "Suntikkan" profil siswa yang benar ke dalam objek $ikutUjian
+        //    Kita gunakan properti baru 'profil_siswa' agar tidak bentrok.
+        $ikutUjian->profil_siswa = $profilSiswa;
+
+        // 2. Ambil data jawaban secara manual berdasarkan id_ujian dan id_siswa
+        $daftarJawaban = \App\Models\Jawaban::where('id_ujian', $ikutUjian->id_ujian)
+                                            ->where('id_siswa', $ikutUjian->id_siswa)
+                                            ->with('soal') // Eager load soal untuk setiap jawaban
+                                            ->paginate(5);
+
+        // Lapis Keamanan: Pastikan guru yang mengakses adalah pemilik ujian ini
+        $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
+        if (!$guru || $ikutUjian->ujian->id_guru != $guru->id) {
+            abort(403, 'ANDA TIDAK MEMILIKI AKSES KE HALAMAN INI.');
+        }
+
+        // 3. Kirim variabel baru '$daftarJawaban' ke view
+        return view('pages.ujian.hasil', compact('ikutUjian', 'daftarJawaban'));
+    }
+
+    /**
+     * Menghapus (membatalkan) data pengerjaan ujian seorang siswa.
+     */
+    public function batalkanHasil(IkutUjian $ikutUjian)
+    {
+        // Lapis Keamanan: Pastikan guru yang mengakses adalah pemilik ujian ini
+        $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
+        if (!$guru || $ikutUjian->ujian->id_guru != $guru->id) {
+            abort(403, 'ANDA TIDAK MEMILIKI AKSES UNTUK MELAKUKAN TINDAKAN INI.');
+        }
+
+        // Simpan id ujian untuk redirect kembali
+        $idUjian = $ikutUjian->id_ujian;
+
+        // Hapus semua jawaban terkait
+        Jawaban::where('id_ujian', $ikutUjian->id_ujian)
+               ->where('id_siswa', $ikutUjian->id_siswa)
+               ->delete();
+        
+        // Hapus data riwayat ujian
+        $ikutUjian->delete();
+
+        return redirect()->route('ujian.detail', $idUjian)
+            ->with('success', 'Hasil ujian siswa telah berhasil dibatalkan.');
     }
 }

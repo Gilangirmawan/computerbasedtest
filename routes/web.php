@@ -99,7 +99,10 @@ Route::middleware('role:guru')->group(function(){
     Route::delete('/ujian/delete/{id}', [UjianController::class, 'delete'])->name('ujian.delete');
 
     // 🚨 Ganti path detail jadi /ujian/{ujian}/detail supaya tidak bentrok dengan pola /ujian/{id} milik resource
-    // Route::get('/ujian/{ujian}/detail', [UjianController::class, 'detail'])->name('ujian.detail');
+    Route::get('/ujian/{ujian}/detail', [UjianController::class, 'detail'])->name('ujian.detail');
+    Route::get('/ujian/{ujian}/export', [UjianController::class, 'export'])->name('ujian.export');
+    Route::get('/hasil-ujian/{ikutUjian}/lihat', [UjianController::class, 'lihatHasil'])->name('ujian.lihatHasil');
+    Route::delete('/hasil-ujian/{ikutUjian}/batalkan', [UjianController::class, 'batalkanHasil'])->name('ujian.batalkanHasil');
 });
 
 // routes siswa

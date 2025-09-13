@@ -31,4 +31,12 @@ class IkutUjian extends Model
     {
         return $this->belongsTo(Ujian::class, 'id_ujian');
     }
+    
+    public function jawaban()
+    {
+        // Sebuah riwayat ujian memiliki banyak jawaban.
+        // Kita hubungkan berdasarkan 'id_ujian' dan 'id_siswa'
+        return $this->hasMany(Jawaban::class, 'id_siswa', 'id_siswa')
+                    ->where('id_ujian', $this->id_ujian);
+    }
 }
