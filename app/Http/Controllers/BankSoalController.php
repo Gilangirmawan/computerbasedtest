@@ -18,9 +18,23 @@ class BankSoalController extends Controller
     // Menampilkan daftar soal
     public function index()
     {
-        $soalList = Soal::with(['mapel','kelas.jurusan', 'guru'])
-                        ->orderByDesc('tgl_input')
-                        ->paginate(10);
+        // 1. Ambil profil guru yang sedang login
+        $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
+
+        // 2. Buat query dasar untuk model Soal
+        $query = Soal::with(['mapel','kelas.jurusan', 'guru'])
+                     ->orderByDesc('tgl_input');
+
+        // 3. Tambahkan filter: jika profil guru ditemukan, tampilkan hanya soal miliknya
+        if ($guru) {
+            $query->where('id_guru', $guru->id);
+        } else {
+            // Jika tidak ada profil guru, jangan tampilkan soal apapun
+            $query->whereRaw('1 = 0'); // Kondisi yang selalu salah
+        }
+
+        // 4. Terapkan paginasi pada hasil yang sudah difilter
+        $soalList = $query->paginate(10);
 
         return view('pages.banksoal.index', compact('soalList'));
     }
@@ -50,8 +64,6 @@ class BankSoalController extends Controller
             'file'     => 'nullable|file|max:4096',
         ]);
 
-        // =================================================================
-        // PERBAIKAN UTAMA DI SINI
         // 1. Ambil profil guru
         $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
 
@@ -87,7 +99,7 @@ class BankSoalController extends Controller
         }
 
         $soal->save();
-        return redirect()->route('banksoal.index')->with('success', 'Soal berhasil ditambahkan.');
+        return redirect()->route('banksoal.index')->with('swal_success', 'Soal berhasil ditambahkan.');
     }
 
     // Form edit soal
@@ -136,7 +148,7 @@ class BankSoalController extends Controller
         }
 
         $soal->save();
-        return redirect()->route('banksoal.index')->with('success', 'Soal berhasil diperbarui.');
+        return redirect()->route('banksoal.index')->with('swal_success', 'Soal berhasil diperbarui.');
     }
 
     // Hapus soal
@@ -150,7 +162,7 @@ class BankSoalController extends Controller
 
         $soal->delete();
 
-        return redirect()->route('banksoal.index')->with('success', 'Soal berhasil dihapus');
+        return redirect()->route('banksoal.index')->with('swal_success', 'Soal berhasil dihapus');
     }
 
     public function importCreate()
@@ -184,6 +196,6 @@ class BankSoalController extends Controller
             return redirect()->route('banksoal.import.create')->with('import_errors', ['Gagal mengimpor file: ' . $e->getMessage()]);
         }
 
-        return redirect()->route('banksoal.index')->with('success', 'Soal berhasil diimpor!');
+        return redirect()->route('banksoal.index')->with('swal_success', 'Soal berhasil diimpor!');
     }
 }

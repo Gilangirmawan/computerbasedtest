@@ -19,79 +19,134 @@ class UjianController extends Controller
 {
     public function index()
     {
-        // eager load sampai jurusan agar tampil di tabel
-        // $ujianList = Ujian::with(['mapel', 'kelas.jurusan'])->latest()->get();
+        $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
+        
+        $query = Ujian::with(['mapel', 'kelas.jurusan', 'soal', 'guru'])
+                      ->withCount('soal')
+                      ->latest();
 
-        $ujianList = Ujian::with(['mapel','kelas.jurusan','soal', 'guru'])
-                    ->withCount('soal')
-                    ->orderBy('id', 'desc')
-                    ->get();
+        if ($guru) {
+            $query->where('id_guru', $guru->id);
+        } else {
+            $query->whereRaw('1 = 0');
+        }
+
+        $ujianList = $query->paginate(1);
 
         return view('pages.ujian.index', compact('ujianList'));
     }
 
     public function create()
     {
-        $mapelList = Mapel::all();
-        $kelasList = Kelas::with('jurusan')->get();
+        $mapelList = Mapel::orderBy('nama')->get();
+        $kelasList = Kelas::with('jurusan')->orderBy('kelas')->get();
+        // Mengambil semua soal yang ada untuk ditampilkan di form
+        $soalList  = Soal::with(['mapel','kelas.jurusan'])->orderBy('id', 'desc')->get();
 
-        $mapelList = Mapel::all();
-        $kelasList = Kelas::with('jurusan')->get();
-
-        // pool awal (opsional): batasi 100
-        $soalPool  = \App\Models\Soal::with(['mapel','kelas.jurusan'])
-                    ->latest('id')->take(100)->get();
-
-        return view('pages.ujian.create', compact('mapelList', 'kelasList', 'soalPool'));
+        return view('pages.ujian.create', compact('mapelList', 'kelasList', 'soalList'));
     }
 
     // Ganti dari 'tambah' -> 'store'
     public function tambah(Request $request)
     {
-        $data = $this->validated($request);
+        // $data = $this->validated($request);
+        // $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
 
-        // =================================================================
-        // PERBAIKAN UTAMA DI SINI
-        // 1. Ambil profil guru terlebih dahulu
+        // if (!$guru) {
+        //     return redirect()->back()
+        //         ->withErrors(['msg' => 'Gagal menyimpan ujian. Profil guru untuk pengguna ini tidak ditemukan.'])
+        //         ->withInput();
+        // }
+
+        // $mulai     = Carbon::createFromFormat('Y-m-d\TH:i', $data['waktu_mulai']);
+        // $durasi    = (int) $data['waktu'];
+        // $terlambat = isset($data['terlambat']) && $data['terlambat']
+        //     ? Carbon::createFromFormat('Y-m-d\TH:i', $data['terlambat'])
+        //     : null;
+
+        // $ujian = new Ujian();
+        // $ujian->nama_ujian   = $data['nama_ujian'];
+        // $ujian->id_mapel     = $data['id_mapel'];
+        // $ujian->kelas_id     = $data['kelas_id'];
+        // $ujian->kode_jurusan = $data['kode_jurusan'];
+        // $ujian->jumlah_soal  = (int) $data['jumlah_soal'];
+        // $ujian->waktu        = $durasi;
+        // $ujian->jenis        = $data['jenis'];
+        // $ujian->waktu_mulai   = $mulai;
+        // $ujian->waktu_selesai = $mulai->copy()->addMinutes($durasi);
+        // $ujian->terlambat     = $terlambat;
+        // $ujian->token         = $data['token'];
+        
+        // $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
+        // if (!$guru) {
+        //     return redirect()->back()->withErrors(['msg' => 'Gagal menyimpan ujian. Profil guru tidak ditemukan.'])->withInput();
+        // }
+        // $ujian->id_guru = $guru->id;
+
+        // $ujian->save();
+        
+        // $soalIds = collect($request->input('soal_ids', []))->map(fn($v)=>(int)$v);
+
+        // if ($request->jenis === 'acak' || $soalIds->isEmpty()) {
+        //     $soalIds = Soal::where('id_mapel', $ujian->id_mapel)
+        //         ->where('kelas_id', $ujian->kelas_id)
+        //         ->inRandomOrder()
+        //         ->limit((int)$ujian->jumlah_soal)
+        //         ->pluck('id');
+        // }
+
+        // $attach = [];
+        // foreach ($soalIds as $i => $id) {
+        //     $attach[$id] = ['urutan' => $i+1, 'bobot' => 1];
+        // }
+        // $ujian->soal()->sync($attach);
+
+        // 1. Validasi semua input dari form
+        $request->validate([
+            'nama_ujian'   => 'required|string|max:255',
+            'id_mapel'     => 'required|exists:mapel,id',
+            'kelas_id'     => 'required|exists:kelas,id',
+            'kode_jurusan' => 'required|string',
+            'jumlah_soal'  => 'required|integer|min:1',
+            'waktu'        => 'required|integer|min:1',
+            'jenis'        => 'required|in:acak,set',
+            'waktu_mulai'  => 'required|date',
+            'terlambat'    => 'nullable|date|after_or_equal:waktu_mulai',
+            'token'        => 'required|string|max:20',
+        ]);
+
+        // 2. Ambil profil guru untuk otorisasi
         $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
 
-        // 2. Tambahkan pengecekan: jika profil guru tidak ada, hentikan proses
+        // 3. Lapis Keamanan: Hentikan jika profil guru tidak ditemukan
         if (!$guru) {
             return redirect()->back()
                 ->withErrors(['msg' => 'Gagal menyimpan ujian. Profil guru untuk pengguna ini tidak ditemukan.'])
                 ->withInput();
         }
-        // =================================================================
 
-        $mulai     = Carbon::createFromFormat('Y-m-d\TH:i', $data['waktu_mulai']);
-        $durasi    = (int) $data['waktu'];
-        $terlambat = isset($data['terlambat']) && $data['terlambat']
-            ? Carbon::createFromFormat('Y-m-d\TH:i', $data['terlambat'])
-            : null;
+        // 4. Buat dan simpan data ujian baru
+        $mulai = Carbon::parse($request->waktu_mulai);
+        $durasi = (int) $request->waktu;
 
         $ujian = new Ujian();
-        $ujian->nama_ujian   = $data['nama_ujian'];
-        $ujian->id_mapel     = $data['id_mapel'];
-        $ujian->kelas_id     = $data['kelas_id'];
-        $ujian->kode_jurusan = $data['kode_jurusan'];
-        $ujian->jumlah_soal  = (int) $data['jumlah_soal'];
+        $ujian->nama_ujian   = $request->nama_ujian;
+        $ujian->id_mapel     = $request->id_mapel;
+        $ujian->kelas_id     = $request->kelas_id;
+        $ujian->kode_jurusan = $request->kode_jurusan;
+        $ujian->jumlah_soal  = (int) $request->jumlah_soal;
         $ujian->waktu        = $durasi;
-        $ujian->jenis        = $data['jenis'];
+        $ujian->jenis        = $request->jenis;
         $ujian->waktu_mulai   = $mulai;
         $ujian->waktu_selesai = $mulai->copy()->addMinutes($durasi);
-        $ujian->terlambat     = $terlambat;
-        $ujian->token         = $data['token'];
+        $ujian->terlambat     = $request->terlambat ? Carbon::parse($request->terlambat) : null;
+        $ujian->token         = $request->token;
+        $ujian->id_guru       = $guru->id; // Gunakan ID dari profil guru
         
-        $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
-        if (!$guru) {
-            return redirect()->back()->withErrors(['msg' => 'Gagal menyimpan ujian. Profil guru tidak ditemukan.'])->withInput();
-        }
-        $ujian->id_guru = $guru->id;
+        $ujian->save(); // Simpan ujian
 
-        $ujian->save();
-        
-        // --- Bekukan paket soal untuk ujian ini ---
-        $soalIds = collect($request->input('soal_ids', []))->map(fn($v)=>(int)$v);
+        // 5. Logika untuk membekukan paket soal
+        $soalIds = collect($request->input('soal_ids', []));
 
         if ($request->jenis === 'acak' || $soalIds->isEmpty()) {
             $soalIds = Soal::where('id_mapel', $ujian->id_mapel)
@@ -113,53 +168,114 @@ class UjianController extends Controller
     public function edit($id)
     {
         $ujian     = Ujian::findOrFail($id);
-        $mapelList = Mapel::all();
-        $kelasList = Kelas::with('jurusan')->get();
-        $ujian = Ujian::with('soal')->findOrFail($id);
-        $mapelList = Mapel::all();
-        $kelasList = Kelas::with('jurusan')->get();
-        $soalPool  = \App\Models\Soal::with(['mapel','kelas.jurusan'])
-                    ->latest('id')->take(150)->get();
+        $mapelList = Mapel::orderBy('nama')->get();
+        $kelasList = Kelas::with('jurusan')->orderBy('kelas')->get();
 
-        return view('pages.ujian.edit', compact('ujian', 'mapelList', 'kelasList', 'soalPool'));
+        // Mengambil semua soal yang ada untuk ditampilkan di form
+        $soalList  = Soal::with(['mapel','kelas.jurusan'])->orderBy('id', 'desc')->get();
+
+        // Mengambil ID dari soal-soal yang sudah ada di paket ujian ini
+        $paketIds = $ujian->soal()->pluck('soal.id')->toArray();
+
+        return view('pages.ujian.edit', compact('ujian', 'mapelList', 'kelasList', 'soalList', 'paketIds'));
     }
 
     public function update(Request $request, $id)
     {
+        // $ujian = Ujian::findOrFail($id);
+        // $data  = $this->validated($request);
+
+        // $mulai     = Carbon::createFromFormat('Y-m-d\TH:i', $data['waktu_mulai']);
+        // $durasi    = (int) $data['waktu'];
+        // $terlambat = isset($data['terlambat']) && $data['terlambat']
+        //     ? Carbon::createFromFormat('Y-m-d\TH:i', $data['terlambat'])
+        //     : null;
+
+        // $ujian->nama_ujian   = $data['nama_ujian'];
+        // $ujian->id_mapel     = $data['id_mapel'];
+        // $ujian->kelas_id     = $data['kelas_id'];
+        // $ujian->kode_jurusan = $data['kode_jurusan'];
+        // $ujian->jumlah_soal  = (int) $data['jumlah_soal'];
+        // $ujian->waktu        = $durasi;
+        // $ujian->jenis        = $data['jenis'];
+        // $ujian->waktu_mulai   = $mulai;
+        // $ujian->waktu_selesai = $mulai->copy()->addMinutes($durasi);
+        // $ujian->terlambat     = $terlambat;
+        // $ujian->token         = $data['token'];
+
+        // if ($guruId = Guru::where('user_id', Auth::id())->value('id')) {
+        //     $ujian->id_guru = $guruId;   
+        // }
+
+        // $ujian->save();
+
+        // if ($request->boolean('refresh_paket')) {
+        //     $soalIds = collect($request->input('soal_ids', []))->map(fn($v)=>(int)$v);
+
+        //     if ($ujian->jenis === 'acak' || $soalIds->isEmpty()) {
+        //         $soalIds = \App\Models\Soal::where('id_mapel', $ujian->id_mapel)
+        //             ->where('kelas_id', $ujian->kelas_id)
+        //             ->inRandomOrder()
+        //             ->limit((int)$ujian->jumlah_soal)
+        //             ->pluck('id');
+        //     }
+
+        //     $attach = [];
+        //     foreach ($soalIds as $i => $id) {
+        //         $attach[$id] = ['urutan' => $i+1, 'bobot' => 1];
+        //     }
+        //     $ujian->soal()->sync($attach);
+        // }
+
+        // 2. Validasi semua input dari form
+        $request->validate([
+            'nama_ujian'   => 'required|string|max:255',
+            'id_mapel'     => 'required|exists:mapel,id',
+            'kelas_id'     => 'required|exists:kelas,id',
+            'kode_jurusan' => 'required|string',
+            'jumlah_soal'  => 'required|integer|min:1',
+            'waktu'        => 'required|integer|min:1',
+            'jenis'        => 'required|in:acak,set',
+            'waktu_mulai'  => 'required|date',
+            'terlambat'    => 'nullable|date|after_or_equal:waktu_mulai',
+            'token'        => 'required|string|max:20',
+        ]);
+
+        // 3. Cari data ujian berdasarkan $id
         $ujian = Ujian::findOrFail($id);
-        $data  = $this->validated($request);
 
-        $mulai     = Carbon::createFromFormat('Y-m-d\TH:i', $data['waktu_mulai']);
-        $durasi    = (int) $data['waktu'];
-        $terlambat = isset($data['terlambat']) && $data['terlambat']
-            ? Carbon::createFromFormat('Y-m-d\TH:i', $data['terlambat'])
-            : null;
+        // 4. Ambil profil guru untuk otorisasi
+        $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
 
-        $ujian->nama_ujian   = $data['nama_ujian'];
-        $ujian->id_mapel     = $data['id_mapel'];
-        $ujian->kelas_id     = $data['kelas_id'];
-        $ujian->kode_jurusan = $data['kode_jurusan'];
-        $ujian->jumlah_soal  = (int) $data['jumlah_soal'];
-        $ujian->waktu        = $durasi;
-        $ujian->jenis        = $data['jenis'];
-        $ujian->waktu_mulai   = $mulai;
-        $ujian->waktu_selesai = $mulai->copy()->addMinutes($durasi);
-        $ujian->terlambat     = $terlambat;
-        $ujian->token         = $data['token'];
-
-        // PILIH SALAH SATU (sesuai FK):
-        // $ujian->id_guru = Auth::id(); // jika refer ke users.id
-        if ($guruId = Guru::where('user_id', Auth::id())->value('id')) {
-            $ujian->id_guru = $guruId;   // jika refer ke guru.id
+        // 5. Lapis Keamanan: Pastikan hanya pemilik yang bisa mengedit
+        if (!$guru || $ujian->id_guru != $guru->id) {
+            abort(403, 'ANDA TIDAK MEMILIKI IZIN UNTUK MENGEDIT UJIAN INI.');
         }
 
-        $ujian->save();
+        // 6. Update data ujian satu per satu
+        $mulai = Carbon::parse($request->waktu_mulai);
+        $durasi = (int) $request->waktu;
 
-        if ($request->boolean('refresh_paket')) {
-            $soalIds = collect($request->input('soal_ids', []))->map(fn($v)=>(int)$v);
+        $ujian->nama_ujian   = $request->nama_ujian;
+        $ujian->id_mapel     = $request->id_mapel;
+        $ujian->kelas_id     = $request->kelas_id;
+        $ujian->kode_jurusan = $request->kode_jurusan;
+        $ujian->jumlah_soal  = (int) $request->jumlah_soal;
+        $ujian->waktu        = $durasi;
+        $ujian->jenis        = $request->jenis;
+        $ujian->waktu_mulai   = $mulai;
+        $ujian->waktu_selesai = $mulai->copy()->addMinutes($durasi);
+        $ujian->terlambat     = $request->terlambat ? Carbon::parse($request->terlambat) : null;
+        $ujian->token         = $request->token;
+        
+        $ujian->save(); // Simpan perubahan pada ujian
 
-            if ($ujian->jenis === 'acak' || $soalIds->isEmpty()) {
-                $soalIds = \App\Models\Soal::where('id_mapel', $ujian->id_mapel)
+        // 7. Logika untuk menyegarkan paket soal jika dicentang
+        if ($request->input('refresh_paket')) {
+            $soalIds = collect($request->input('soal_ids', []));
+
+            if ($request->jenis === 'acak' || $soalIds->isEmpty()) {
+                $soalIds = Soal::where('id_mapel', $ujian->id_mapel)
                     ->where('kelas_id', $ujian->kelas_id)
                     ->inRandomOrder()
                     ->limit((int)$ujian->jumlah_soal)
@@ -167,8 +283,8 @@ class UjianController extends Controller
             }
 
             $attach = [];
-            foreach ($soalIds as $i => $id) {
-                $attach[$id] = ['urutan' => $i+1, 'bobot' => 1];
+            foreach ($soalIds as $i => $soalId) {
+                $attach[$soalId] = ['urutan' => $i+1, 'bobot' => 1];
             }
             $ujian->soal()->sync($attach);
         }

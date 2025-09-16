@@ -175,29 +175,29 @@
       {{-- Bagian 4: Keamanan --}}
       <div class="mb-3 section-title">Keamanan</div>
       <div class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label">Token</label>
-          <input type="text"
-                 name="token"
-                 maxlength="5"
-                 class="form-control @error('token') is-invalid @enderror"
-                 value="{{ old('token', $ujian->token) }}"
-                 placeholder="Contoh: ELSWN"
-                 required>
-          @error('token') <div class="invalid-feedback">{{ $message }}</div> @enderror
-          <small class="text-muted">Maksimal 5 karakter. Huruf/angka diperbolehkan.</small>
-        </div>
+      <div class="form-group">
+                <label for="token">Token Ujian *</label>
+                <div class="input-group">
+                    <input type="text" name="token" id="token-input" class="form-control" 
+                           value="{{ old('token', $ujian->token) }}" 
+                           placeholder="Ketik manual atau generate otomatis" required>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="generate-token-btn">
+                            <i class="fas fa-random"></i> Generate
+                        </button>
+                    </div>
+                </div>
+            </div>
       </div>
-
       <hr class="my-4">
 
         {{-- Bagian 5: Paket Soal (Bank Soal Mapel) --}}
         {{-- <div class="mb-3 section-title">Paket Soal (Mapel: {{ $ujian->mapel->nama ?? '-' }})</div>
 
-        @php --}}
+        @php
             //ID soal yang sudah terpilih pada ujian saat ini
-            {{-- $selected = $ujian->soals->pluck('id')->toArray();
-        @endphp --}}
+            $selected = $ujian->soals->pluck('id')->toArray();
+        @endphp
 
         {{-- <div class="border rounded p-3" style="max-height: 380px; overflow: auto;">
             @forelse($bankSoal as $s)
@@ -231,25 +231,26 @@
           $paketIds = $ujian->soal()->pluck('soal.id')->toArray();
         @endphp
 
-        <div id="blok-pilih-soal" class="mt-3" style="display: {{ $ujian->jenis==='set' ? '' : 'none' }};">
-          <label class="form-label">Pilih Soal (Mode Set)</label>
-          <div class="border rounded p-2" style="max-height: 260px; overflow:auto;">
-            @foreach($soalPool ?? [] as $s)
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="soal_ids[]"
-                      value="{{ $s->id }}" id="soal{{ $s->id }}"
-                      {{ in_array($s->id, $paketIds) ? 'checked' : '' }}>
-                <label class="form-check-label" for="soal{{ $s->id }}">
-                  {{ Str::limit($s->soal, 80) }} — (Kelas {{ $s->kelas->kelas ?? '-' }}, {{ $s->mapel->nama ?? '-' }})
-                </label>
-              </div>
-            @endforeach
-          </div>
-
-          <div class="form-check mt-2">
-            <input type="checkbox" class="form-check-input" id="refresh_paket" name="refresh_paket" value="1">
-            <label class="form-check-label" for="refresh_paket">Segarkan paket soal saat simpan</label>
-          </div>
+        <div id="blok-pilih-soal" class="mt-3" style="display: {{ old('jenis', $ujian->jenis) === 'set' ? 'block' : 'none' }};">
+            <label class="form-label">Pilih Soal (Mode Set)</label>
+            <div class="border rounded p-2" style="max-height: 260px; overflow:auto;">
+              @forelse($soalList as $s)
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="soal_ids[]"
+                        value="{{ $s->id }}" id="soal{{ $s->id }}"
+                        {{ in_array($s->id, $paketIds) ? 'checked' : '' }}>
+                  <label class="form-check-label" for="soal{{ $s->id }}">
+                    {{ Str::limit(strip_tags($s->soal), 80) }} — (Kelas {{ $s->kelas->kelas ?? '-' }}, {{ $s->mapel->nama ?? '-' }})
+                  </label>
+                </div>
+              @empty
+                <div class="text-muted small">Tidak ada soal yang tersedia di bank soal untuk dipilih.</div>
+              @endforelse
+            </div>
+            <div class="form-check mt-2">
+                <input type="checkbox" class="form-check-input" id="refresh_paket" name="refresh_paket" value="1">
+                <label class="form-check-label" for="refresh_paket">Segarkan paket soal saat simpan</label>
+            </div>
         </div>
 
 
@@ -263,6 +264,31 @@
   </div>
 </div>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Ambil elemen tombol dan input
+    const generateBtn = document.getElementById('generate-token-btn');
+    const tokenInput = document.getElementById('token-input');
+
+    // Tambahkan event listener saat tombol di-klik
+    generateBtn.addEventListener('click', function() {
+        // Panggil fungsi untuk membuat token acak
+        const randomToken = generateRandomToken(6); // Buat token 6 karakter
+        // Masukkan token ke dalam input field
+        tokenInput.value = randomToken;
+    });
+
+    // Fungsi untuk membuat token acak
+    function generateRandomToken(length) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+});
+</script>
 {{-- Auto-set jurusan berdasarkan kelas --}}
 <script>
   document.addEventListener('DOMContentLoaded', function () {

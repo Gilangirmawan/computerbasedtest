@@ -8,6 +8,23 @@
   </a>
 </div>
 
+{{-- Catatan / Petunjuk --}}
+    <div class="alert alert-info">
+        <h5><i class="fas fa-info-circle"></i> Petunjuk Pembuatan Ujian</h5>
+        <ul>
+            <li>Tentukan Judul Ujian contoh: UTS (Ujian Tengah Semester Ganjil/Genap).</li>
+            <li>Pastikan koneksi internet stabil sebelum membuat ujian.</li>
+            <li>Pastikan kelas yang dipilih sudah.</li>
+            <li>Jumlah soal yang ingin dijadikan ujian harus sesuai dengan yang ada pada bank soal.</li>
+            <li>Setelah waktu ujian selesai harap periksa detail ujian untuk melihat <br>
+              seluruh siswa yang mengerjakan ujian.</li>
+            <li>Terdapat tombol batalkan ujian bagi siswa yang melanggar peraturan.</li>
+            <li>Silahkan langsung export nilai siswa jika semuanya sudah selesai.</li>
+            <li>Hapus ujian yang sudah dikerjakan oleh siswa <br> 
+                agar tidak ada penumpukan (pastikan nilai sudah diexport terlebih dahulu).</li>
+        </ul>
+    </div>
+
 <div class="card shadow">
   <div class="card-body">
     @if(session('success') && !session('swal_success'))
@@ -15,7 +32,7 @@
     @endif
 
     <div class="table-responsive">
-      <table class="table table-bordered table-hover align-middle">
+      <table class="table table-bordered table-striped table-hover align-middle">
         <thead class="table-light">
           <tr class="text-center">
             <th>No</th>
@@ -33,7 +50,7 @@
         <tbody>
           @forelse($ujianList as $i => $u)
             <tr class="text-center">
-              <td>{{ $i+1 }}</td>
+              <td>{{ $ujianList->firstItem() + $i }}</td>
               <td>{{ $u->nama_ujian }}</td>
               <td>{{ $u->mapel->nama ?? '-' }}</td>
               <td>{{ $u->soal_count }}</td>
@@ -50,31 +67,19 @@
               <td><code>{{ $u->token }}</code></td>
               <td class="text-capitalize">{{ $u->jenis }}</td>
               <td>
-                @php
-                    // Ambil profil guru dari user yang sedang login
-                    $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
-                @endphp
-            
-                @if ($guru && $u->id_guru == $guru->id)
-                    {{-- Jika guru yang login adalah pembuat ujian, tampilkan tombol --}}
-                    <a href="{{ route('ujian.detail', $u->id) }}" class="btn btn-sm btn-info">
-                        <i class="fas fa-eye"></i>Lihat Detail Ujian
-                    </a>
-                    <a href="{{ route('ujian.edit', $u->id) }}" class="btn btn-sm btn-warning">
-                        <i class="fas fa-pencil-alt"></i> Edit
-                    </a>
-                    <form id="delete-form-{{ $u->id }}" action="{{ route('ujian.delete', $u->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('DELETE')
-                        {{-- Tombol ini sekarang memicu SweetAlert, bukan submit langsung --}}
-                        <button type="button" class="btn btn-sm btn-danger delete-button" data-form-id="{{ $u->id }}">
-                            <i class="fas fa-trash"></i> Hapus
-                        </button>
-                    </form>
-                @else
-                    {{-- Jika bukan, tampilkan nama pembuatnya --}}
-                    <span class="badge bg-secondary text-light">Dibuat oleh: {{ $u->guru->name ?? 'N/A' }}</span>
-                @endif
+                <a href="{{ route('ujian.detail', $u->id) }}" class="btn btn-sm btn-info">
+                    <i class="fas fa-eye"></i> Lihat Detail
+                </a>
+                <a href="{{ route('ujian.edit', $u->id) }}" class="btn btn-sm btn-warning">
+                    <i class="fas fa-pencil-alt"></i> Edit
+                </a>
+                <form id="delete-form-{{ $u->id }}" action="{{ route('ujian.delete', $u->id) }}" method="POST" class="d-inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" class="btn btn-sm btn-danger delete-button" data-form-id="{{ $u->id }}">
+                        <i class="fas fa-trash"></i> Hapus
+                    </button>
+                </form>
               </td>
             </tr>
           @empty
@@ -82,6 +87,9 @@
           @endforelse
         </tbody>
       </table>
+    </div>
+    <div class="d-flex justify-content-center">
+        {{ $ujianList->links() }}
     </div>
   </div>
 </div>

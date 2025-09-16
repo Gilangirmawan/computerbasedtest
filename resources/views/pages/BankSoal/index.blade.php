@@ -14,13 +14,19 @@
     </div>
 </div>
 
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
+{{-- Catatan / Petunjuk --}}
+    <div class="alert alert-info">
+        <h5><i class="fas fa-info-circle"></i> Petunjuk Pengerjaan</h5>
+        <ul>
+            <li>Pastikan kelas yang dipilih sudah sesuai.</li>
+            <li>Pastikan koneksi internet stabil.</li>
+            <li>Hapus soal setelah ujian sudah pada mata pelajaran tertentu sudah diselesaikan.</li>
+        </ul>
+    </div>
+
+    {{-- Notifikasi --}}
+    @if (session('success') && !session('swal_success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
     <!-- Tabel Soal -->
@@ -61,26 +67,18 @@
                                                 <span class="text-muted">Tidak ada</span>
                                             @endif
                                         </td>
-                                       <td>
-                                            @php
-                                                // Ambil profil guru dari user yang sedang login
-                                                $guru = \App\Models\Guru::where('user_id', Auth::id())->first();
-                                            @endphp
-                                            
-                                            @if ($guru && $soal->id_guru == $guru->id)
-                                                <a href="{{ route('banksoal.edit', $soal->id) }}" class="btn btn-sm btn-warning">
-                                                    Edit <i class="fas fa-pen"></i>
-                                                </a>
-                                                <form action="{{ route('banksoal.delete', $soal->id) }}" method="POST" class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Hapus soal ini?')">
-                                                        Hapus <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @else
-                                                <span class="badge bg-secondary text-light">Dibuat oleh: {{ $soal->guru->name ?? 'N/A' }}</span>
-                                            @endif
+                                        <td>
+                                            {{-- Karena controller sudah memfilter, kita bisa langsung tampilkan tombol --}}
+                                            <a href="{{ route('banksoal.edit', $soal->id) }}" class="btn btn-sm btn-warning">
+                                                Edit <i class="fas fa-pen"></i>
+                                            </a>
+                                            <form id="delete-form-{{ $soal->id }}" action="{{ route('banksoal.delete', $soal->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="btn btn-sm btn-danger delete-button" data-form-id="{{ $soal->id }}">
+                                                    Hapus <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @empty
@@ -101,4 +99,44 @@
             </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+
+        // 1. Logika untuk notifikasi SUKSES
+        @if (session('swal_success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: '{{ session('swal_success') }}',
+                confirmButtonText: 'OK'
+            });
+        @endif
+
+        // 2. Logika untuk konfirmasi HAPUS
+        document.querySelectorAll('.delete-button').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                var formId = this.getAttribute('data-form-id');
+                var form = document.getElementById('delete-form-' + formId);
+
+                Swal.fire({
+                    title: 'Anda yakin?',
+                    text: "Soal yang akan dihapus tidak dapat dikembalikan!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+    });
+</script>
 @endsection

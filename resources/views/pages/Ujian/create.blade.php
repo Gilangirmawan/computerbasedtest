@@ -171,38 +171,36 @@
       {{-- Bagian 4: Keamanan --}}
       <div class="mb-3 section-title">Keamanan</div>
       <div class="row g-3">
-        <div class="col-md-4">
-          <label class="form-label">Token</label>
-          <input type="text"
-                 name="token"
-                 maxlength="5"
-                 class="form-control @error('token') is-invalid @enderror"
-                 value="{{ old('token') }}"
-                 {{-- placeholder="Contoh: ELSWN" --}}
-                 required>
-          @error('token') <div class="invalid-feedback">{{ $message }}</div> @enderror
-          <small class="text-muted">Maksimal 5 karakter. Huruf/angka diperbolehkan.</small>
-        </div>
+        <div class="form-group">
+                <label for="token">Token Ujian *</label>
+                <div class="input-group">
+                    <input type="text" name="token" id="token-input" class="form-control" 
+                           placeholder="Ketik manual atau generate otomatis" required>
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="generate-token-btn">
+                            <i class="fas fa-random"></i> Generate
+                        </button>
+                    </div>
+                </div>
+            </div>
       </div>
 
       {{-- Pilih Soal (muncul saat jenis = set) --}}
       <div id="blok-pilih-soal" class="mt-3" style="display:none;">
-        <label class="form-label">Pilih Soal (Mode Set)</label>
-        <div class="border rounded p-2" style="max-height: 260px; overflow:auto;">
-          @foreach($soalPool ?? [] as $s)
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="soal_ids[]"
-                    value="{{ $s->id }}" id="soal{{ $s->id }}">
-              <label class="form-check-label" for="soal{{ $s->id }}">
-                {{ Str::limit($s->soal, 80) }} — (Kelas {{ $s->kelas->kelas ?? '-' }}, {{ $s->mapel->nama ?? '-' }})
-              </label>
-            </div>
-          @endforeach
-          @if(empty($soalPool) || count($soalPool)===0)
-            <div class="text-muted small">Soal akan ditarik otomatis (acak) karena pool kosong.</div>
-          @endif
-        </div>
-        <div class="form-text">Jika tidak memilih, sistem akan mengacak sesuai Mapel & Kelas.</div>
+          <label class="form-label">Pilih Soal (Mode Set)</label>
+          <div class="border rounded p-2" style="max-height: 260px; overflow:auto;">
+            @forelse($soalList as $s)
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="soal_ids[]" value="{{ $s->id }}" id="soal{{ $s->id }}">
+                <label class="form-check-label" for="soal{{ $s->id }}">
+                  {{ Str::limit(strip_tags($s->soal), 80) }} — (Kelas {{ $s->kelas->kelas ?? '-' }}, {{ $s->mapel->nama ?? '-' }})
+                </label>
+              </div>
+            @empty
+              <div class="text-muted small">Tidak ada soal di bank soal. Soal akan diambil secara acak.</div>
+            @endforelse
+          </div>
+          <div class="form-text">Jika tidak ada soal yang dipilih, sistem akan mengacak soal secara otomatis sesuai Mapel & Kelas yang dituju.</div>
       </div>
 
       <div class="mt-4 d-flex gap-2">
@@ -215,6 +213,31 @@
   </div>
 </div>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Ambil elemen tombol dan input
+    const generateBtn = document.getElementById('generate-token-btn');
+    const tokenInput = document.getElementById('token-input');
+
+    // Tambahkan event listener saat tombol di-klik
+    generateBtn.addEventListener('click', function() {
+        // Panggil fungsi untuk membuat token acak
+        const randomToken = generateRandomToken(6); // Buat token 6 karakter
+        // Masukkan token ke dalam input field
+        tokenInput.value = randomToken;
+    });
+
+    // Fungsi untuk membuat token acak
+    function generateRandomToken(length) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+});
+</script>
 {{-- Auto-set jurusan berdasarkan kelas --}}
 <script>
   document.addEventListener('DOMContentLoaded', function () {
