@@ -14,7 +14,8 @@
         <ul>
             <li>Tentukan Judul Ujian contoh: UTS (Ujian Tengah Semester Ganjil/Genap).</li>
             <li>Pastikan koneksi internet stabil sebelum membuat ujian.</li>
-            <li>Pastikan kelas yang dipilih sudah.</li>
+            <li>Jangan lupa untuk generate token (membuat token).</li>
+            <li>Pastikan kelas yang dipilih sudah sesuai dengan kelas pada bank soal.</li>
             <li>Jumlah soal yang ingin dijadikan ujian harus sesuai dengan yang ada pada bank soal.</li>
             <li>Setelah waktu ujian selesai harap periksa detail ujian untuk melihat <br>
               seluruh siswa yang mengerjakan ujian.</li>

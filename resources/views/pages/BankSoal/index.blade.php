@@ -20,7 +20,7 @@
         <ul>
             <li>Pastikan kelas yang dipilih sudah sesuai.</li>
             <li>Pastikan koneksi internet stabil.</li>
-            <li>Hapus soal setelah ujian sudah pada mata pelajaran tertentu sudah diselesaikan.</li>
+            <li>Hapus soal setelah ujian pada mata pelajaran tertentu sudah diselesaikan.</li>
         </ul>
     </div>
 
