@@ -30,13 +30,15 @@ Route::middleware('role:admin,guru,siswa')->group(function(){
 
 Route::middleware('role:admin')->group(function(){
     // Routes for guru
-    Route::resource('guru', GuruController::class);
+    // Route::resource('guru', GuruController::class);
     Route::get('/guru', [GuruController::class, 'index'])->name('guru.index');
     Route::get('/guru/create', [GuruController::class, 'create'])->name('guru.create');
     Route::post('/guru/create', [GuruController::class, 'tambah'])->name('guru.tambah');
     Route::get('/guru/edit/{id}', [GuruController::class, 'edit'])->name('guru.edit');
     Route::put('/guru/{id}', [GuruController::class, 'update'])->name('guru.update');
     Route::delete('/guru/delete/{id}', [GuruController::class, 'delete'])->name('guru.delete');
+    Route::get('/guru/import', [GuruController::class, 'importCreate'])->name('guru.import.create');
+    Route::post('/guru/import', [GuruController::class, 'importStore'])->name('guru.import.store');
 
     // Routes for Siswa
     Route::get('/siswa', [SiswaController::class, 'index'])->name('siswa.index');

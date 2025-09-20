@@ -110,6 +110,25 @@
     <script src="{{ asset('template/js/demo/chart-area-demo.js') }}"></script>
     <script src="{{ asset('template/js/demo/chart-pie-demo.js') }}"></script>
 
+    <script>
+        function fixSidebarState() {
+            // Jika lebar jendela lebih dari 768px (desktop)
+            if (window.innerWidth > 768) {
+                // Hapus kelas yang membuat sidebar terlipat
+                document.body.classList.remove('sidebar-toggled');
+                document.querySelector('.sidebar').classList.remove('toggled');
+            }
+        }
+
+        // Jalankan fungsi saat halaman pertama kali dimuat
+        fixSidebarState();
+
+        // Jalankan kembali fungsi setiap kali ukuran jendela diubah
+        window.addEventListener('resize', fixSidebarState);
+    </script>
+    {{-- ========================================================= --}}
+
+    @stack('scripts')
 </body>
 
 </html>

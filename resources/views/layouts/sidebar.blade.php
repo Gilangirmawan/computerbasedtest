@@ -9,17 +9,17 @@
             (object) [
                 'title' => 'Guru',
                 'path' => 'guru',
-                'icon' => 'fas fa-fw fa-table',
+                'icon' => 'fas fa-chalkboard-teacher',
             ],
             (object) [
                 'title' => 'Siswa',
                 'path' => 'siswa',
-                'icon' => 'fas fa-fw fa-table',
+                'icon' => 'fas fa-user-graduate',
             ],
             (object) [
                 'title' => 'Mata Pelajaran',
                 'path' => 'mapel',
-                'icon' => 'fas fa-fw fa-table',
+                'icon' => 'fas fa-book-open',
             ],(object) [
                 'title' => 'Jurusan',
                 'path' => 'jurusan',
@@ -28,7 +28,7 @@
             (object) [
                 'title' => 'Kelas',
                 'path' => 'kelas',
-                'icon' => 'fas fa-fw fa-table',
+                'icon' => 'fas fa-users',
             ],
         ],
         2 =>  [

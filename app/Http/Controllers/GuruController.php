@@ -7,15 +7,16 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\GuruRequest;
 use Illuminate\Support\Facades\Hash;
+use App\Imports\GuruImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class GuruController extends Controller
 {
     public function index()
     {
-        $guru = Guru::all();
-        return view('pages.guru.index',[
-            'guru'=> $guru,
-        ]);
+        $guru = Guru::with('user')->latest()->paginate(10);
+    
+        return view('pages.guru.index', compact('guru'));
     }
 
     public function create()
@@ -47,8 +48,8 @@ class GuruController extends Controller
     $guru->nama = $request->nama;
     $guru->user_id = $user->id;
     $guru->save();
-    
-    return redirect()->route('guru.index')->with('success', 'Guru berhasil ditambahkan.');
+
+    return redirect()->route('guru.index')->with('swal_success', 'Guru berhasil ditambahkan.');
     }
 
     public function edit($id)
@@ -82,13 +83,43 @@ class GuruController extends Controller
             }
         }
 
-        return redirect()->route('guru.index')->with('success', 'Data guru berhasil diperbarui.');
+        return redirect()->route('guru.index')->with('swal_success', 'Data guru berhasil diperbarui.');
     }
 
     public function delete($id)
     {
         $guru = Guru::findOrFail($id);
         $guru->delete();
-        return redirect()->route('guru.index')->with('success', 'Data guru berhasil dihapus');
+        return redirect()->route('guru.index')->with('swal_success', 'Data guru berhasil dihapus');
+    }
+
+    public function importCreate()
+    {
+        return view('pages.guru.import');
+    }
+
+    /**
+     * Menjalankan proses import dari file Excel.
+     */
+    public function importStore(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+        ]);
+
+        try {
+            Excel::import(new GuruImport, $request->file('file'));
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+             $failures = $e->failures();
+             $errors = [];
+             foreach ($failures as $failure) {
+                 $errors[] = 'Baris ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+             }
+             return redirect()->route('guru.import.create')->with('import_errors', $errors);
+        } catch (\Exception $e) {
+            return redirect()->route('guru.import.create')->with('import_errors', ['Gagal mengimpor file: ' . $e->getMessage()]);
+        }
+
+        return redirect()->route('guru.index')->with('swal_success', 'Data guru berhasil diimpor!');
     }
 }
