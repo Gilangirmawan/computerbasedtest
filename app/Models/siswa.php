@@ -12,7 +12,7 @@ class siswa extends Model
 
     protected $fillable = [
         'nis', 'nama', 'username', 'password',
-        'jenis_kelamin', 'kelas', 'foto','status','user_id'
+        'jenis_kelamin', 'kelas_id', 'jurusan_id','status','user_id'
     ];
 
     protected $hidden = ['password'];
@@ -30,7 +30,7 @@ class siswa extends Model
 
     public function jurusan()
     {
-         return $this->belongsTo(Jurusan::class,'jurusan_id', 'kode_jurusan'); // jika pakai kode_jurusan
+        return $this->belongsTo(Jurusan::class,'jurusan_id', 'kode_jurusan'); // jika pakai kode_jurusan
     }
 
     public function jawaban()

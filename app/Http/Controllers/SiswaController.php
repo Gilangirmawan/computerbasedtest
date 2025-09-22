@@ -8,13 +8,16 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Kelas;
 use App\Models\Jurusan;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\SiswaImport;
 
 class SiswaController extends Controller
 {
     public function index()
     {
-        $siswa = Siswa::with(['kelas', 'jurusan', 'user'])->get();
-            return view('pages.siswa.index', compact('siswa'));
+        $siswa = Siswa::with(['kelas', 'jurusan', 'user'])->latest()->paginate(10);
+        
+        return view('pages.siswa.index', compact('siswa'));
     }
     public function create(Request $request)
     {
@@ -76,7 +79,7 @@ class SiswaController extends Controller
 
         // Siswa::create($validatedData);
 
-        return redirect()->route('siswa.index')->with('success', 'Data siswa berhasil ditambahkan');
+        return redirect()->route('siswa.index')->with('swal_success', 'Data siswa berhasil ditambahkan');
     }
 
     public function edit($id)
@@ -108,6 +111,7 @@ class SiswaController extends Controller
         $siswa->nis = $request->input('nis');
         $siswa->kelas_id = $request->input('kelas_id');
         $siswa->jurusan_id = $request->input('jurusan_id');
+        $siswa->jenis_kelamin = $request->input('jenis_kelamin');
         $siswa->save();
 
         //update status siswa
@@ -119,7 +123,7 @@ class SiswaController extends Controller
         $user->status = $request->input('status');
         $user->save();
 
-        return redirect()->route('siswa.index')->with('success', 'Data berhasil diupdate.');
+        return redirect()->route('siswa.index')->with('swal_success', 'Data berhasil diupdate.');
     }
 
     public function delete($id)
@@ -134,8 +138,36 @@ class SiswaController extends Controller
         // Hapus siswa
         $siswa->delete();
 
-        return redirect()->route('siswa.index')->with('success', 'Data siswa dan user berhasil dihapus.');
+        return redirect()->route('siswa.index')->with('swal_success', 'Data siswa dan user berhasil dihapus.');
     }
 
+    public function importCreate()
+    {
+        return view('pages.siswa.import');
+    }
 
+    /**
+     * Menjalankan proses import dari file Excel.
+     */
+    public function importStore(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+        ]);
+
+        try {
+            Excel::import(new SiswaImport, $request->file('file'));
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+             $failures = $e->failures();
+             $errors = [];
+             foreach ($failures as $failure) {
+                 $errors[] = 'Baris ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+             }
+             return redirect()->route('siswa.import.create')->with('import_errors', $errors);
+        } catch (\Exception $e) {
+            return redirect()->route('siswa.import.create')->with('import_errors', ['Gagal mengimpor file: ' . $e->getMessage()]);
+        }
+
+        return redirect()->route('siswa.index')->with('swal_success', 'Data siswa berhasil diimpor!');
+    }
 }

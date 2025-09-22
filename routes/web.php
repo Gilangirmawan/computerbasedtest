@@ -48,6 +48,10 @@ Route::middleware('role:admin')->group(function(){
     Route::put('/siswa/{id}', [SiswaController::class, 'update'])->name('siswa.update');
     Route::delete('/siswa/{id}', [SiswaController::class, 'delete'])->name('siswa.delete');
 
+    // Routes for Siswa Import
+    Route::get('/siswa/import', [SiswaController::class, 'importCreate'])->name('siswa.import.create');
+    Route::post('/siswa/import', [SiswaController::class, 'importStore'])->name('siswa.import.store');
+
     // Routes for Siswa Status
     Route::put('/siswa/{id}/approve', [SiswaStatusController::class, 'approve'])->name('siswa.approve');
     Route::put('/siswa/{id}/reject', [SiswaStatusController::class, 'reject'])->name('siswa.reject');

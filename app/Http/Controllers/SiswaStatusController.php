@@ -16,7 +16,7 @@ class SiswaStatusController extends Controller
         $user->status = 'approved';
         $user->save();
 
-        return redirect()->back()->with('success', 'Status siswa berhasil disetujui.');
+        return redirect()->back()->with('swal_success', 'Status siswa berhasil disetujui.');
     }
 
     public function reject($id)
@@ -27,6 +27,6 @@ class SiswaStatusController extends Controller
         $user->status = 'rejected';
         $user->save();
 
-        return redirect()->back()->with('success', 'Status siswa berhasil ditolak.');
+        return redirect()->back()->with('swal_success', 'Status siswa berhasil ditolak.');
     }
 }
