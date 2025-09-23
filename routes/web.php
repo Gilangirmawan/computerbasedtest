@@ -15,6 +15,7 @@ use App\Http\Controllers\DashboardController;
 use App\Models\Jurusan;
 use App\Models\Kelas;
 use App\Models\Mapel;
+use App\Http\Controllers\AdministratorController;
 
 //Auth Routes
 Route::get('/', [AuthController::class, 'login'])->name('login');
@@ -80,6 +81,16 @@ Route::middleware('role:admin')->group(function(){
     Route::get('/kelas/edit/{id}', [KelasController::class, 'edit'])->name('kelas.edit');
     Route::put('/kelas/{id}', [KelasController::class, 'update'])->name('kelas.update');
     Route::delete('/kelas/delete/{id}', [KelasController::class, 'delete'])->name('kelas.delete');
+
+    // Routes for Administrator
+    Route::middleware('superadmin')->group(function () {
+        Route::get('/administrator', [AdministratorController::class, 'index'])->name('administrator.index');
+        Route::get('/administrator/create', [AdministratorController::class, 'create'])->name('administrator.create');
+        Route::post('/administrator', [AdministratorController::class, 'store'])->name('administrator.store');
+        Route::get('/administrator/{administrator}/edit', [AdministratorController::class, 'edit'])->name('administrator.edit');
+        Route::put('/administrator/{administrator}', [AdministratorController::class, 'update'])->name('administrator.update');
+        Route::delete('/administrator/{administrator}', [AdministratorController::class, 'destroy'])->name('administrator.destroy');
+    });
 });
 
 

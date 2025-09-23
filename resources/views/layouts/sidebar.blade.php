@@ -7,6 +7,11 @@
                 'icon' => 'fas fa-fw fa-tachometer-alt',
             ],
             (object) [
+                'title' => 'Administrator',
+                'path' => 'administrator',
+                'icon' => 'fas fa-user',
+            ],
+            (object) [
                 'title' => 'Guru',
                 'path' => 'guru',
                 'icon' => 'fas fa-chalkboard-teacher',
@@ -99,6 +104,15 @@
                     <span>{{ $menu->title }}</span></a>
             </li>
             @endforeach
+
+            @if (Auth::user()->is_superadmin)
+            <li class="nav-item {{ request()->is('administrator*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('administrator.index') }}">
+                    <i class="fas fa-fw fa-user-shield"></i>
+                    <span>Administrator</span>
+                </a>
+            </li>
+            @endif
 
             
 
