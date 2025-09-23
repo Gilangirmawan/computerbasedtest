@@ -8,6 +8,15 @@
         </a>
     </div>
 
+    {{-- Reminder Untuk Admin --}}
+    <div class="alert alert-info">
+        <h5><i class="fas fa-info-circle"></i> Catatan Admin</h5>
+        <ul>
+            <li>Data jurusan yang ada sekarang tidak bisa dihapus ataupun diedit jika data tersebut sedang digunakan pada bagian kelas.</li>
+            <li>Solusinya adalah mengahapus data kelas yang berkaitan dngan jurusan terlenih dahulu kemudian baru edit atau hapus data jurusan.</li>
+        </ul>
+    </div>
+
     {{-- Menampilkan notifikasi sukses dengan SweetAlert --}}
     @if (session('swal_success'))
     @elseif(session('success'))

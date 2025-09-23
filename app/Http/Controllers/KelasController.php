@@ -10,10 +10,8 @@ class KelasController extends Controller
 {
     public function index()
     {
-        $kelas = Kelas::all();
-        return view('pages.kelas.index',[
-            'kelas'=> $kelas,
-        ]);
+        $kelas = Kelas::with('jurusan')->orderBy('kelas')->get();
+        return view('pages.kelas.index', compact('kelas'));
     }
 
     // Tampilkan form tambah kelas
@@ -29,46 +27,36 @@ class KelasController extends Controller
     public function tambah(Request $request)
     {
         $request->validate([
-        'kelas' => 'required|string',
-        'jurusan_id' => 'required|exists:jurusan,kode_jurusan'
-    ]);
-// dd($request->all());
-
-    Kelas::create([
-        'kelas' => $request->kelas,
-        'jurusan_id' => $request->jurusan_id,
-    ]);
-    $jurusanList = Jurusan::all();
-
-        return redirect()->route('kelas.index')->with('success', 'Kelas berhasil ditambahkan.');
+            'kelas' => 'required|string|max:20',
+            'jurusan_id' => 'required|exists:jurusan,kode_jurusan',
+        ]);
+        Kelas::create($request->all());
+        return redirect()->route('kelas.index')->with('swal_success', 'Data kelas berhasil ditambahkan.');
     }
 
     // Tampilkan form edit kelas
     public function edit($id)
     {
-        $jurusanList = Jurusan::all();
         $kelas = Kelas::findOrFail($id);
-        return view('pages.kelas.edit',[
-            'kelas'=> $kelas,
-        ]);
+        $jurusanList = Jurusan::orderBy('nama')->get();
+        return view('pages.kelas.edit', compact('kelas', 'jurusanList'));
     }
 
     public function update(Request $request, $id)
     {
-        $data = $request->all(); // ✅ gunakan ini
-        // atau lebih aman:
-        // $data = $request->only(['nama', 'nip']);
-
         $kelas = Kelas::findOrFail($id);
-        $kelas->update($data);
-
-        return redirect()->route('kelas.index')->with('success', 'Data berhasil diupdate.');
+        $request->validate([
+            'kelas' => 'required|string|max:20',
+            'jurusan_id' => 'required|exists:jurusan,kode_jurusan',
+        ]);
+        $kelas->update($request->all());
+        return redirect()->route('kelas.index')->with('swal_success', 'Data kelas berhasil diperbarui.');
     }
 
     public function delete($id)
     {
         $kelas = Kelas::findOrFail($id);
         $kelas->delete();
-        return redirect()->route('kelas.index')->with('success', 'Data Kelas berhasil dihapus');
+        return redirect()->route('kelas.index')->with('swal_success', 'Data kelas berhasil dihapus.');
     }
 }
