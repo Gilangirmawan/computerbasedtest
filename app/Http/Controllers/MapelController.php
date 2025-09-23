@@ -9,7 +9,7 @@ class MapelController extends Controller
 {
     public function index()
     {
-        $mapel = Mapel::all();
+        $mapel = Mapel::latest()->paginate(5);
         return view('pages.mapel.index',[
             'mapel'=> $mapel,
         ]);
@@ -30,7 +30,7 @@ class MapelController extends Controller
             'nama' => $request->input('nama'),
         ]);
 
-        return redirect()->route('mapel.index')->with('success', 'Mata pelajaran berhasil ditambahkan.');
+        return redirect()->route('mapel.index')->with('swal_success', 'Mata pelajaran berhasil ditambahkan.');
     }
 
     public function edit($id)
@@ -50,13 +50,13 @@ class MapelController extends Controller
         $mapel = Mapel::findOrFail($id);
         $mapel->update($data);
 
-        return redirect()->route('mapel.index')->with('success', 'Data berhasil diupdate.');
+        return redirect()->route('mapel.index')->with('swal_success', 'Data berhasil diupdate.');
     }
 
     public function delete($id)
     {
         $mapel = Mapel::findOrFail($id);
         $mapel->delete();
-        return redirect()->route('mapel.index')->with('success', 'Data guru berhasil dihapus');
+        return redirect()->route('mapel.index')->with('swal_success', 'Data guru berhasil dihapus');
     }
 }

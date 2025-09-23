@@ -21,6 +21,7 @@
                         @enderror
                     </div>
                     <button type="submit" class="btn btn-primary">Update</button>
+                    <a href="{{ route('mapel.index') }}" class="btn btn-secondary">Batal</a>
                 </form>
             </div>
         </div>
