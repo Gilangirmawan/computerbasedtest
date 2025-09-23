@@ -29,7 +29,7 @@ class JurusanController extends Controller
 
         Jurusan::create($request->only(['kode_jurusan', 'nama']));
 
-        return redirect()->route('jurusan.index')->with('success', 'Jurusan berhasil ditambahkan.');
+        return redirect()->route('jurusan.index')->with('swal_success', 'Jurusan berhasil ditambahkan.');
     }
 
     public function edit($id)
@@ -49,13 +49,13 @@ class JurusanController extends Controller
         $jurusan = Jurusan::findOrFail($id);
         $jurusan->update($data);
 
-        return redirect()->route('jurusan.index')->with('success', 'Data berhasil diupdate.');
+        return redirect()->route('jurusan.index')->with('swal_success', 'Data berhasil diupdate.');
     }
 
     public function delete($id)
     {
         $jurusan = Jurusan::findOrFail($id);
         $jurusan->delete();
-        return redirect()->route('jurusan.index')->with('success', 'Data jurusan berhasil dihapus');
+        return redirect()->route('jurusan.index')->with('swal_success', 'Data jurusan berhasil dihapus');
     }
 }

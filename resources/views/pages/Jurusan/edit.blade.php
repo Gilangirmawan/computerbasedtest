@@ -28,6 +28,7 @@
                         @enderror
                     </div>
                     <button type="submit" class="btn btn-primary">Update</button>
+                    <a href="{{ route('jurusan.index') }}" class="btn btn-secondary">Batal</a>
                 </form>
             </div>
         </div>
