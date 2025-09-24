@@ -13,11 +13,31 @@ use App\Imports\SiswaImport;
 
 class SiswaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $siswa = Siswa::with(['kelas', 'jurusan', 'user'])->latest()->paginate(10);
-        
-        return view('pages.siswa.index', compact('siswa'));
+        // Ambil input untuk filter
+        $kelasId = $request->input('kelas_id');
+        $jurusanId = $request->input('jurusan_id');
+
+        // Buat query dasar untuk model Siswa
+        $query = Siswa::with(['user', 'kelas', 'jurusan'])->latest();
+
+        // Terapkan filter jika ada
+        if ($kelasId) {
+            $query->where('kelas_id', $kelasId);
+        }
+        if ($jurusanId) {
+            $query->where('jurusan_id', $jurusanId);
+        }
+
+        // Jalankan query dengan paginasi
+        $siswa = $query->paginate(5);
+
+        // Ambil semua data kelas dan jurusan untuk ditampilkan di dropdown filter
+        $kelasList = \App\Models\Kelas::orderBy('kelas')->get();
+        $jurusanList = \App\Models\Jurusan::orderBy('nama')->get();
+
+        return view('pages.siswa.index', compact('siswa', 'kelasList', 'jurusanList'));
     }
     public function create(Request $request)
     {

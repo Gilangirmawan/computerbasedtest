@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use App\Models\User;
 use App\Models\Siswa;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
@@ -108,26 +109,52 @@ class AuthController extends Controller
             'jurusan_id' => 'required|exists:jurusan,kode_jurusan',
         ]);
 
-    // Simpan data user siswa
-    $user = new User();
-    $user->name = $request->input('name');
-    $user->username = $request->input('username'); 
-    $user->password = Hash::make($request->input('password'));
-    $user->status = 'submitted'; // default status
-    $user->role_id = 3; // 3 = siswa
+        // Simpan data user siswa
+        $user = new User();
+        $user->name = $request->input('name');
+        $user->username = $request->input('username'); 
+        $user->password = Hash::make($request->input('password'));
+        $user->status = 'submitted'; // default status
+        $user->role_id = 3; // 3 = siswa
 
-    $user->save();
+        $user->save();
 
-    $siswa = new Siswa();
-    $siswa->user_id = $user->id;
-    $siswa->nis = $request->input('nis');
-    $siswa->nama = $request->input('name');
-    $siswa->username = $request->input('username');
-    $siswa->password = Hash::make($request->input('password'));
-    $siswa->kelas_id = $request->input('kelas_id'); // ✅ ini benar
-    $siswa->jurusan_id = $request->input('jurusan_id'); // ✅ ini benar
-    $siswa->save();
+        $siswa = new Siswa();
+        $siswa->user_id = $user->id;
+        $siswa->nis = $request->input('nis');
+        $siswa->nama = $request->input('name');
+        $siswa->username = $request->input('username');
+        $siswa->password = Hash::make($request->input('password'));
+        $siswa->kelas_id = $request->input('kelas_id'); // ✅ ini benar
+        $siswa->jurusan_id = $request->input('jurusan_id'); // ✅ ini benar
+        $siswa->save();
 
-    return redirect()->route('login')->with('success', 'Pendaftaran berhasil, silakan login.');
+        return redirect()->route('login')->with('success', 'Pendaftaran berhasil, silakan login.');
+    }
+
+     public function showChangePasswordForm()
+    {
+        return view('pages.auth.ganti-password');
+    }
+
+    /**
+     * Memproses permintaan ganti password.
+     */
+    public function changePassword(Request $request)
+    {
+        // 1. Validasi Input
+        $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'confirmed', Password::defaults()],
+        ]);
+
+        // 2. Update Password Pengguna
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        // 3. Redirect dengan pesan sukses
+        return redirect()->route('dashboard')->with('swal_success', 'Password Anda berhasil diperbarui!');
     }
 }

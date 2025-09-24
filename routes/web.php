@@ -91,6 +91,10 @@ Route::middleware('role:admin')->group(function(){
         Route::put('/administrator/{administrator}', [AdministratorController::class, 'update'])->name('administrator.update');
         Route::delete('/administrator/{administrator}', [AdministratorController::class, 'destroy'])->name('administrator.destroy');
     });
+
+    // Route for ganti password
+    Route::get('/ganti-password', [App\Http\Controllers\AuthController::class, 'showChangePasswordForm'])->name('password.change');
+    Route::post('/ganti-password', [App\Http\Controllers\AuthController::class, 'changePassword'])->name('password.update');
 });
 
 
@@ -120,6 +124,9 @@ Route::middleware('role:guru')->group(function(){
     Route::get('/ujian/{ujian}/export', [UjianController::class, 'export'])->name('ujian.export');
     Route::get('/hasil-ujian/{ikutUjian}/lihat', [UjianController::class, 'lihatHasil'])->name('ujian.lihatHasil');
     Route::delete('/hasil-ujian/{ikutUjian}/batalkan', [UjianController::class, 'batalkanHasil'])->name('ujian.batalkanHasil');
+
+    // Route::get('/ganti-password', [AuthController::class, 'showChangePasswordForm'])->name('password.change.guru');
+    // Route::post('/ganti-password', [AuthController::class, 'changePassword'])->name('password.update.guru');
 });
 
 // routes siswa
@@ -132,4 +139,7 @@ Route::middleware('role:siswa')->group(function () {
 
     // route simpan jawaban
     Route::post('/jawaban/simpan', [IkutUjianController::class, 'simpanJawaban'])->name('jawaban.simpan');
+
+    // Route::get('/ganti-password', [AuthController::class, 'showChangePasswordForm'])->name('password.change.siswa');
+    // Route::post('/ganti-password', [AuthController::class, 'changePassword'])->name('password.update.siswa');
 });

@@ -8,6 +8,8 @@ use App\Models\Ujian;
 use App\Models\IkutUjian;
 use App\Models\Guru;
 use App\Models\Soal;
+use App\Models\User;
+use App\Models\Siswa;
 
 class DashboardController extends Controller
 {
@@ -18,6 +20,13 @@ class DashboardController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
+
+        //  dd([
+        //     'STATUS' => 'Mengecek data pengguna yang sedang login...',
+        //     'User Lengkap' => $user,
+        //     'Role ID Pengguna' => $user->role_id,
+        //     'NOTE' => 'Perhatikan "Role ID Pengguna". Apakah nilainya 1? Jika tidak, maka kondisi untuk menampilkan dashboard admin tidak akan terpenuhi.'
+        // ]);
 
         if ($user->role_id == 3) { // 3 = siswa
             
@@ -75,6 +84,17 @@ class DashboardController extends Controller
             return view('pages.dashboard_guru', compact('profilGuru', 'jumlahSoal', 'ujianDibuat')); 
         } elseif ($user->role_id == 1) { // 1 = admin
             return view('pages.dashboard');
+        } elseif ($user->role_id == 1) {
+            // Card 1: Hitung jumlah administrator (user dengan role_id = 1)
+            $jumlahAdmin = User::where('role_id', 1)->count();
+            
+            // Card 2: Hitung jumlah total guru
+            $jumlahGuru = Guru::count();
+
+            // Card 3: Hitung jumlah total siswa
+            $jumlahSiswa = Siswa::count();
+            
+            return view('pages.dashboard_admin', compact('jumlahAdmin', 'jumlahGuru', 'jumlahSiswa'));
         }
 
         // Fallback jika pengguna tidak memiliki peran atau peran tidak cocok

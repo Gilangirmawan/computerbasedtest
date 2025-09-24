@@ -12,6 +12,41 @@
             </a>
         </div>
     </div>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filter Data Siswa</h6>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ route('siswa.index') }}">
+                <div class="row">
+                    <div class="col-md-5">
+                         <div class="form-group">
+                            <label for="jurusan_id">Filter Berdasarkan Jurusan</label>
+                            <select name="jurusan_id" id="jurusan_id" class="form-control">
+                                <option value="">Semua Jurusan</option>
+                                @foreach ($jurusanList as $jurusan)
+                                    {{-- ========================================================= --}}
+                                    {{-- PERBAIKAN DI SINI: Gunakan 'kode_jurusan' bukan 'id' --}}
+                                    {{-- ========================================================= --}}
+                                    <option value="{{ $jurusan->kode_jurusan }}" {{ request('jurusan_id') == $jurusan->kode_jurusan ? 'selected' : '' }}>
+                                        {{ $jurusan->nama }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <div class="form-group w-100">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                            <a href="{{ route('siswa.index') }}" class="btn btn-secondary w-100 mt-2">Reset</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
     {{-- Notifikasi akan ditangani oleh skrip di bawah --}}
     @if (session('swal_success'))
@@ -80,7 +115,7 @@
             </div>
             {{-- Menampilkan tombol paginasi --}}
             <div class="d-flex justify-content-center">
-                {{ $siswa->links() }}
+                {{ $siswa->appends(request()->query())->links() }}
             </div>
         </div>
     </div>
