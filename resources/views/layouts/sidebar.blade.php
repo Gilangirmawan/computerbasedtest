@@ -6,11 +6,11 @@
                 'path' => 'dashboard',
                 'icon' => 'fas fa-fw fa-tachometer-alt',
             ],
-            (object) [
-                'title' => 'Administrator',
-                'path' => 'administrator',
-                'icon' => 'fas fa-user',
-            ],
+            // (object) [
+            //     'title' => 'Administrator',
+            //     'path' => 'administrator',
+            //     'icon' => 'fas fa-user',
+            // ],
             (object) [
                 'title' => 'Guru',
                 'path' => 'guru',

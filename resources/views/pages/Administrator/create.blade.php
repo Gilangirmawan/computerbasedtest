@@ -10,6 +10,17 @@
 
     <div class="card shadow mb-4">
         <div class="card-body">
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <strong>Terjadi kesalahan:</strong>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <form action="{{ route('administrator.store') }}" method="POST">
                 @csrf
                 <div class="mb-3">
@@ -26,17 +37,38 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
+
+                {{-- ========================================================= --}}
+                {{-- PERBAIKAN PADA INPUT PASSWORD --}}
+                {{-- ========================================================= --}}
                 <div class="mb-3">
                     <label for="password" class="form-label">Password *</label>
-                    <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" required>
+                    <div class="input-group">
+                        <input type="password" name="password" id="password" class="form-control @error('password') is-invalid @enderror" required>
+                        <div class="input-group-append">
+                            <span class="input-group-text" style="cursor: pointer;" id="toggle-password">
+                                <i class="fa fa-eye" id="eye-icon"></i>
+                            </span>
+                        </div>
+                    </div>
                     @error('password')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
                 </div>
+
                 <div class="mb-3">
                     <label for="password_confirmation" class="form-label">Konfirmasi Password *</label>
-                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required>
+                    <div class="input-group">
+                        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" required>
+                        <div class="input-group-append">
+                             <span class="input-group-text" style="cursor: pointer;" id="toggle-password-confirmation">
+                                <i class="fa fa-eye" id="eye-icon-confirmation"></i>
+                            </span>
+                        </div>
+                    </div>
                 </div>
+                {{-- ========================================================= --}}
+                
                 <div class="form-check mb-3">
                     <input class="form-check-input" type="checkbox" name="is_superadmin" id="is_superadmin">
                     <label class="form-check-label" for="is_superadmin">
@@ -48,3 +80,38 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+{{-- ========================================================= --}}
+{{-- SCRIPT BARU UNTUK FITUR LIHAT PASSWORD --}}
+{{-- ========================================================= --}}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Logika untuk field password utama
+        const togglePassword = document.querySelector('#toggle-password');
+        const passwordInput = document.querySelector('#password');
+        const eyeIcon = document.querySelector('#eye-icon');
+
+        togglePassword.addEventListener('click', function () {
+            // Ganti tipe input
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            // Ganti ikon mata
+            eyeIcon.classList.toggle('fa-eye-slash');
+        });
+
+        // Logika untuk field konfirmasi password
+        const togglePasswordConfirmation = document.querySelector('#toggle-password-confirmation');
+        const passwordConfirmationInput = document.querySelector('#password_confirmation');
+        const eyeIconConfirmation = document.querySelector('#eye-icon-confirmation');
+
+        togglePasswordConfirmation.addEventListener('click', function () {
+            // Ganti tipe input
+            const type = passwordConfirmationInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordConfirmationInput.setAttribute('type', type);
+            // Ganti ikon mata
+            eyeIconConfirmation.classList.toggle('fa-eye-slash');
+        });
+    });
+</script>
+@endpush
