@@ -26,6 +26,12 @@ Route::post('/register', [AuthController::class, 'register'])->name('register');
 
 Route::middleware('role:admin,guru,siswa')->group(function(){
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Route untuk menampilkan halaman ganti password
+    Route::get('/ganti-password', [App\Http\Controllers\AuthController::class, 'showChangePasswordForm'])->name('password.change');
+    
+    // Route untuk memproses update password
+    Route::post('/ganti-password', [App\Http\Controllers\AuthController::class, 'changePassword'])->name('password.update');
 });
 
 
@@ -93,8 +99,8 @@ Route::middleware('role:admin')->group(function(){
     });
 
     // Route for ganti password
-    Route::get('/ganti-password', [App\Http\Controllers\AuthController::class, 'showChangePasswordForm'])->name('password.change');
-    Route::post('/ganti-password', [App\Http\Controllers\AuthController::class, 'changePassword'])->name('password.update');
+    // Route::get('/ganti-password', [App\Http\Controllers\AuthController::class, 'showChangePasswordForm'])->name('password.change');
+    // Route::post('/ganti-password', [App\Http\Controllers\AuthController::class, 'changePassword'])->name('password.update');
 });
 
 

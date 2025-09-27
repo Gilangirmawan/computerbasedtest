@@ -18,6 +18,7 @@ class SiswaController extends Controller
         // Ambil input untuk filter
         $kelasId = $request->input('kelas_id');
         $jurusanId = $request->input('jurusan_id');
+        $status = $request->input('status');
 
         // Buat query dasar untuk model Siswa
         $query = Siswa::with(['user', 'kelas', 'jurusan'])->latest();
@@ -28,6 +29,11 @@ class SiswaController extends Controller
         }
         if ($jurusanId) {
             $query->where('jurusan_id', $jurusanId);
+        }
+        if ($status) {
+            $query->whereHas('user', function ($subQuery) use ($status) {
+                $subQuery->where('status', $status);
+            });
         }
 
         // Jalankan query dengan paginasi

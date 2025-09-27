@@ -82,9 +82,8 @@ class DashboardController extends Controller
             }
 
             return view('pages.dashboard_guru', compact('profilGuru', 'jumlahSoal', 'ujianDibuat')); 
-        } elseif ($user->role_id == 1) { // 1 = admin
-            return view('pages.dashboard');
-        } elseif ($user->role_id == 1) {
+        }elseif ($user->role_id == 1) { // 1 = admin (INI BAGIAN YANG DIPERBAIKI)
+            
             // Card 1: Hitung jumlah administrator (user dengan role_id = 1)
             $jumlahAdmin = User::where('role_id', 1)->count();
             
@@ -94,6 +93,7 @@ class DashboardController extends Controller
             // Card 3: Hitung jumlah total siswa
             $jumlahSiswa = Siswa::count();
             
+            // Mengarahkan ke view yang benar dengan data yang dibutuhkan
             return view('pages.dashboard_admin', compact('jumlahAdmin', 'jumlahGuru', 'jumlahSiswa'));
         }
 

@@ -19,19 +19,27 @@
         <div class="card-body">
             <form method="GET" action="{{ route('siswa.index') }}">
                 <div class="row">
-                    <div class="col-md-5">
-                         <div class="form-group">
+                    <div class="col-md-4">
+                        <div class="form-group">
                             <label for="jurusan_id">Filter Berdasarkan Jurusan</label>
                             <select name="jurusan_id" id="jurusan_id" class="form-control">
                                 <option value="">Semua Jurusan</option>
                                 @foreach ($jurusanList as $jurusan)
-                                    {{-- ========================================================= --}}
-                                    {{-- PERBAIKAN DI SINI: Gunakan 'kode_jurusan' bukan 'id' --}}
-                                    {{-- ========================================================= --}}
                                     <option value="{{ $jurusan->kode_jurusan }}" {{ request('jurusan_id') == $jurusan->kode_jurusan ? 'selected' : '' }}>
                                         {{ $jurusan->nama }}
                                     </option>
                                 @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="status">Filter Berdasarkan Status</label>
+                            <select name="status" id="status" class="form-control">
+                                <option value="">Semua Status</option>
+                                <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
+                                <option value="submitted" {{ request('status') == 'submitted' ? 'selected' : '' }}>Submitted</option>
+                                <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
                             </select>
                         </div>
                     </div>

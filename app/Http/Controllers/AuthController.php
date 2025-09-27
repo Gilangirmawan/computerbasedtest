@@ -154,7 +154,9 @@ class AuthController extends Controller
         $user->password = Hash::make($request->password);
         $user->save();
 
+        $redirectRoute = 'dashboard';
+
         // 3. Redirect dengan pesan sukses
-        return redirect()->route('dashboard')->with('swal_success', 'Password Anda berhasil diperbarui!');
+        return redirect()->route($redirectRoute)->with('swal_success', 'Password Anda berhasil diperbarui!');
     }
 }

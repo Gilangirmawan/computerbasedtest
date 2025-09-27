@@ -57,11 +57,11 @@
                 'path' => 'ujian',
                 'icon' => 'fas fa-graduation-cap',
             ],
-            // (object) [
-            //     'title' => 'Ganti Password',
-            //     'path' => 'ganti-password',
-            //     'icon' => 'fas fa-lock',
-            // ],
+            (object) [
+                'title' => 'Ganti Password',
+                'path' => 'ganti-password',
+                'icon' => 'fas fa-lock',
+            ],
         ],
         3 =>  [
             (object) [
@@ -74,11 +74,11 @@
                 'path' => 'ikut_ujian',
                 'icon' => 'fas fa-book-open',
             ],
-            // (object) [
-            //     'title' => 'Ganti Password',
-            //     'path' => 'ganti-password',
-            //     'icon' => 'fas fa-lock',
-            // ],
+            (object) [
+                'title' => 'Ganti Password',
+                'path' => 'ganti-password',
+                'icon' => 'fas fa-lock',
+            ],
         ],
     ];
 @endphp
