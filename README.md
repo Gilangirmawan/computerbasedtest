@@ -125,12 +125,3 @@ Berikut adalah langkah-langkah untuk menjalankan proyek ini di lingkungan lokal 
 Aplikasi Anda sekarang berjalan di `http://127.0.0.1:8000`.
 
 ---
-
-## 🧑‍💻 Akun Demo
-
-* **Admin**
-    * **Username:** `admin`
-    * **Password:** `admin123`
-* **Guru**
-    * **Username:** `sesuai nip`
-    * **Password:** `sama dengan username`
