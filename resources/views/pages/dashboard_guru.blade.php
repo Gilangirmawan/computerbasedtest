@@ -4,7 +4,7 @@
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         {{-- Menggunakan data dari $profilGuru untuk sapaan --}}
-        <h1 class="h3 mb-0 text-gray-800">Dashboard - Selamat Datang, {{ $profilGuru->nama ?? Auth::user()->name }}!</h1>
+        <h1 class="h3 mb-0 text-gray-800">Dashboard - Selamat Datang Guru, {{ $profilGuru->nama ?? Auth::user()->name }}!</h1>
     </div>
 
     <div class="row">

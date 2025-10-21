@@ -3,7 +3,7 @@
 @section('content')
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         {{-- Menggunakan data dari $profilAdmin untuk sapaan --}}
-        <h1 class="h3 mb-0 text-gray-800">Dashboard - Selamat Datang, {{ $profilAdmin->nama ?? Auth::user()->name }}!</h1>
+        <h1 class="h3 mb-0 text-gray-800">Dashboard - Selamat Datang Admin, {{ $profilAdmin->nama ?? Auth::user()->name }}!</h1>
     </div>
 
     <div class="row">
