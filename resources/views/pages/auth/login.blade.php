@@ -20,27 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        body {
-            background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("{{ asset('template/img/smk-musasi.png') }}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-        }
-        
-        .card.transparent-card {
-            background-color: rgba(255, 255, 255, 0.1); 
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: none !important;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .transparent-card .text-gray-900 {
-            color: #fff !important;
-        }
+        /* CSS untuk .bg-login-image telah dihapus */
 
         /* ============================================== */
         /* CSS UNTUK IKON PADA INPUT FIELD */
@@ -64,7 +44,7 @@
     </style>
 </head>
 
-<body>
+<body class="bg-gradient-primary">
 
     @if ($errors->any())
         <script>
@@ -77,10 +57,12 @@
     @endif
 
     <div class="container">
+
         <div class="row justify-content-center">
+
             <div class="col-xl-5 col-lg-6 col-md-8">
-                
-                <div class="card o-hidden border-0 my-5 transparent-card">
+
+                <div class="card o-hidden border-0 shadow-lg my-5">
                     <div class="card-body p-0">
                         <div class="row">
                             <div class="col-lg-12">
@@ -111,11 +93,11 @@
                                         <button type="submit" class="btn btn-primary btn-user btn-block">
                                             Login
                                         </button>
-                                        <hr style="border-color: rgba(255,255,255,0.3);">
+                                        <hr>
                                     </form>
-                                    <hr style="border-color: rgba(255,255,255,0.3);">
+                                    <hr>
                                     {{-- <div class="text-center">
-                                        <a class="small" href="/register" style="color: white;">Buat Akun!</a>
+                                        <a class="small" href="/register">Buat Akun!</a>
                                     </div> --}}
                                 </div>
                             </div>
@@ -124,7 +106,9 @@
                 </div>
 
             </div>
+
         </div>
+
     </div>
 
     <script src="{{ asset('template/vendor/jquery/jquery.min.js') }}"></script>
