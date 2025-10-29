@@ -83,12 +83,12 @@ class SiswaController extends Controller
             'role_id' => 3, // siswa
         ]);
         // Handle upload foto jika ada
-            $namaFoto = null;
-            if ($request->hasFile('foto')) {
-                $foto = $request->file('foto');
-                $namaFoto = uniqid() . '.' . $foto->getClientOriginalExtension();
-                $foto->move(public_path('foto_siswa'), $namaFoto); // simpan di folder public/foto_siswa
-            }
+            // $namaFoto = null;
+            // if ($request->hasFile('foto')) {
+            //     $foto = $request->file('foto');
+            //     $namaFoto = uniqid() . '.' . $foto->getClientOriginalExtension();
+            //     $foto->move(public_path('foto_siswa'), $namaFoto); 
+            // }
                 // Simpan ke tabel siswa
             Siswa::create([
                 'nama' => $request->nama,
@@ -98,8 +98,8 @@ class SiswaController extends Controller
                 'jurusan_id' => $request->jurusan_id,
                 'jenis_kelamin' => $request->jenis_kelamin,
                 'password' => $user->password,
-                'user_id' => $user->id, // ✅ Bagian penting
-                'foto' => $namaFoto, // simpan nama file
+                'user_id' => $user->id, 
+                // 'foto' => $namaFoto,
             ]);
 
 
@@ -123,10 +123,14 @@ class SiswaController extends Controller
     public function update(Request $request, $id)
     {
         // dd($request->input('status'));
+        $siswa = Siswa::findOrFail($id);
+        $user = User::findOrFail($siswa->user_id);
         
         $request->validate([
             'nama' => 'required|string',
             'nis' => 'required|string',
+            'username' => 'required|string|unique:users,username,'.$user->id,
+            'jenis_kelamin' => 'required|in:L,P',
             'kelas_id' => 'required|exists:kelas,id',
             'jurusan_id' => 'required|exists:jurusan,kode_jurusan',
             'status' => 'required|string|in:submitted,approved,rejected'
@@ -136,6 +140,7 @@ class SiswaController extends Controller
         $siswa->nama = $request->input('nama');
         $siswa->nis = $request->input('nis');
         $siswa->kelas_id = $request->input('kelas_id');
+        $siswa->username = $request->input('username');
         $siswa->jurusan_id = $request->input('jurusan_id');
         $siswa->jenis_kelamin = $request->input('jenis_kelamin');
         $siswa->save();
@@ -145,7 +150,8 @@ class SiswaController extends Controller
         // $siswa->save();
 
         // Update status di tabel users
-        $user = User::findOrFail($siswa->user_id);
+        $user->name = $request->input('nama');
+        $user->username= $request->input('username');
         $user->status = $request->input('status');
         $user->save();
 

@@ -40,6 +40,11 @@
                 'path' => 'ganti-password',
                 'icon' => 'fas fa-lock',
             ],
+            // (object) [
+            //     'title' => 'Log Out',
+            //     'path' => 'logout',
+            //     'icon' => 'fas fa-sign-out-alt',
+            // ],
         ],
         2 =>  [
             (object) [
@@ -128,6 +133,13 @@
                 </a>
             </li>
             @endif
+
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-toggle="modal" data-target="#logoutModal">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Log Out</span>
+                </a>
+            </li>
 
             
 
