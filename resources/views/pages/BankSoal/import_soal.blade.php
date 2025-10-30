@@ -44,7 +44,7 @@
                     <li>File yang diunggah bisa berformat <strong>.xlsx</strong> atau <strong>.csv</strong>.</li>
                     <li>Pastikan nama header kolom adalah: <strong>soal, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, jawaban</strong>.</li>
                 </ul>
-                <a href="{{ asset('templates/template-soal.xlsx') }}" class="btn btn-success btn-sm mt-2" download>
+                <a href="{{ asset('template/template-soal.xlsx') }}" class="btn btn-success btn-sm mt-2" download>
                     <i class="fas fa-download"></i> Unduh Template Excel
                 </a>
             </div>
