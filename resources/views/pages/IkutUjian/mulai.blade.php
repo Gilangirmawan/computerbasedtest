@@ -18,6 +18,28 @@
         @foreach($soal as $key => $soal)
             <div class="mb-4 p-3 border rounded bg-light soal-item soal-wrapper">
                 <p><b>{{ $key+1 }}. {{ $soal->soal }}</b></p>
+                
+                @if($soal->file)
+                    {{-- 
+                      Kita menggunakan helper Str::startsWith untuk mengecek tipe file.
+                      Ini akan menangani 'image/jpeg', 'image/png', dll.
+                    --}}
+                    @if(Illuminate\Support\Str::startsWith($soal->tipe_file, 'image/'))
+                        <div class="my-2">
+                            <img src="{{ asset('storage/' . $soal->file) }}" 
+                                 alt="Gambar Soal" 
+                                 class="img-fluid rounded" 
+                                 style="max-width: 450px;">
+                        </div>
+                    
+                    {{-- (Opsional) Jika Anda berencana mendukung file audio untuk listening --}}
+                    @elseif(Illuminate\Support\Str::startsWith($soal->tipe_file, 'audio/'))
+                        <audio controls class="my-3" style="width: 100%;">
+                            <source src="{{ asset('storage/' . $soal->file) }}" type="{{ $soal->tipe_file }}">
+                            Browser Anda tidak mendukung elemen audio.
+                        </audio>
+                    @endif
+                @endif
 
                 @foreach(['a','b','c','d','e'] as $opsi)
                     @php $field = 'opsi_'.$opsi; @endphp

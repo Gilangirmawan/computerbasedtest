@@ -156,8 +156,8 @@ class BankSoalController extends Controller
     {
         $soal = Soal::findOrFail($id);
 
-        if ($soal->gambar && file_exists(public_path('gambar_soal/' . $soal->gambar))) {
-            unlink(public_path('gambar_soal/' . $soal->gambar));
+        if ($soal->file && file_exists(public_path('storage/' . $soal->file))) {
+        unlink(public_path('storage/' . $soal->file));
         }
 
         $soal->delete();
