@@ -6,6 +6,7 @@ use App\Models\Ujian;
 use App\Models\Soal;
 use App\Models\IkutUjian;
 use App\Models\Jawaban;
+use App\Models\Siswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;

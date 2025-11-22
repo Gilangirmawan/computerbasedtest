@@ -89,6 +89,9 @@ class GuruController extends Controller
     public function delete($id)
     {
         $guru = Guru::findOrFail($id);
+        if($guru->user){
+            $guru->user->delete();
+        }
         $guru->delete();
         return redirect()->route('guru.index')->with('swal_success', 'Data guru berhasil dihapus');
     }
